@@ -1,0 +1,57 @@
+# supabase/config.toml
+# Supabase project configuration
+
+[project]
+ref = "menwearuz"               # <-- project ref (Supabase dashboard'da bo'ladi)
+project_id = "menwearuz"        # optional
+name = "MenWearUz"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+major_version = 15
+port = 54322
+ssl = false
+shadow_port = 54323
+ip_version = "IPv4"
+pooler_enabled = true
+
+[db.pooler]
+pool_mode = "transaction"
+default_pool_size = 15
+max_client_conn = 100
+
+[auth]
+enabled = true
+site_url = "http://localhost:5173"       # frontend URL (Vite dev server)
+additional_redirect_urls = ["https://menwearuz.vercel.app"]
+jwt_expiry = 3600
+jwt_secret = "super-secret-jwt-key-change-this"  # o'zgartirish kerak
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = false
+enable_confirmations = true
+max_frequency = "1s"
+
+[auth.sms]
+enable_signup = false
+
+[storage]
+enabled = true
+file_size_limit = "50mb"
+
+[storage.image_transformations]
+enabled = true
+
+[studio]
+enabled = true
+port = 54323
+
+[telemetry]
+enabled = true
