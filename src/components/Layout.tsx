@@ -42,7 +42,7 @@ const Layout = ({ children }: LayoutProps) => {
           {/* LOGO */}
           <Link to="/" className="flex items-center space-x-3">
             <img
-              src="/logo.jpeg" // ⚠️ Joylashtiring public/menwear_logo.png
+              src="/logo.jpeg"
               alt="Menwear Logo"
               className="h-8 w-auto drop-shadow-lg"
             />
@@ -126,7 +126,7 @@ const Layout = ({ children }: LayoutProps) => {
             <div>
               <div className="flex items-center space-x-3 mb-4">
                 <img
-                  src="/menwear_logo.png"
+                  src="/logo.jpeg"
                   alt="Menwear Logo"
                   className="h-8 w-auto"
                 />
@@ -175,7 +175,7 @@ const Layout = ({ children }: LayoutProps) => {
               </h3>
               <ul className="space-y-2 text-sm text-gray-400">
                 <li>📞 +998 97 118 1000</li>
-                <li>📱 Telegram: @menwearuz_bot</li>
+                <li>📱 Telegram: @Abdulvadud_Believe</li>
               </ul>
             </div>
           </div>

@@ -33,10 +33,21 @@ const Home = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [cart, setCart] = useState<any[]>([]);
 
   useEffect(() => {
     fetchProducts();
   }, [brandId, categoryId]);
+
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem("cart") || "[]");
+    setCart(saved);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+    window.dispatchEvent(new Event("cartUpdated"));
+  }, [cart]);
 
   const fetchProducts = async () => {
     try {
@@ -64,17 +75,52 @@ const Home = () => {
   };
 
   const addToCart = (product: Product) => {
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    cart.push({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      image: product.images[0],
-      quantity: 1,
-    });
-    localStorage.setItem("cart", JSON.stringify(cart));
+    const existing = cart.find((item) => item.id === product.id);
+    if (existing) {
+      const updated = cart.map((item) =>
+        item.id === product.id
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      );
+      setCart(updated);
+    } else {
+      setCart([
+        ...cart,
+        {
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          image: product.images[0],
+          quantity: 1,
+        },
+      ]);
+    }
     toast.success("Маҳсулот саватга қўшилди");
-    window.dispatchEvent(new Event("cartUpdated"));
+  };
+
+  const decreaseQuantity = (productId: string) => {
+    const updated = cart
+      .map((item) =>
+        item.id === productId
+          ? { ...item, quantity: item.quantity - 1 }
+          : item
+      )
+      .filter((item) => item.quantity > 0);
+    setCart(updated);
+  };
+
+  const increaseQuantity = (productId: string) => {
+    const updated = cart.map((item) =>
+      item.id === productId
+        ? { ...item, quantity: item.quantity + 1 }
+        : item
+    );
+    setCart(updated);
+  };
+
+  const getQuantity = (productId: string) => {
+    const found = cart.find((item) => item.id === productId);
+    return found ? found.quantity : 0;
   };
 
   const filteredProducts = products.filter((product) =>
@@ -88,11 +134,7 @@ const Home = () => {
           {/* HERO SECTION */}
           <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#111] via-[#2a2a2a] to-[#0c0c0c] p-12 mb-16 border border-[#2a2a2a] shadow-[0_0_25px_rgba(212,175,55,0.15)]">
             <div className="relative z-10">
-              <img
-                src="/logo.jpeg"
-                alt="Menwear Logo"
-                className="h-16 mb-4"
-              />
+              <img src="/logo.jpeg" alt="Menwear Logo" className="h-16 mb-4" />
               <h1 className="text-5xl md:text-6xl font-extrabold text-[#d4af37] mb-4 tracking-tight">
                 MENWEAR.UZ
               </h1>
@@ -113,7 +155,6 @@ const Home = () => {
               </Button>
             </div>
 
-            {/* Gold gradient overlay */}
             <div className="absolute inset-0 bg-gradient-to-br from-transparent to-[#d4af3710]" />
           </div>
 
@@ -157,46 +198,78 @@ const Home = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                {filteredProducts.map((product) => (
-                  <Card
-                    key={product.id}
-                    className="group bg-[#1a1a1a] border-[#2a2a2a] hover:border-[#d4af37] hover:shadow-[0_0_20px_rgba(212,175,55,0.2)] transition-all duration-300 cursor-pointer"
-                    onClick={() => navigate(`/product/${product.id}`)}
-                  >
-                    <div className="relative overflow-hidden rounded-t-lg">
-                      <img
-                        src={product.images[0] || "/placeholder.svg"}
-                        alt={product.name}
-                        className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
-                      />
-                      {product.brands && (
-                        <Badge className="absolute top-3 right-3 bg-[#d4af37] text-black font-semibold shadow-md">
-                          {product.brands.name}
-                        </Badge>
+                {filteredProducts.map((product) => {
+                  const quantity = getQuantity(product.id);
+                  return (
+                    <Card
+                      key={product.id}
+                      className="group bg-[#1a1a1a] border-[#2a2a2a] hover:border-[#d4af37] hover:shadow-[0_0_20px_rgba(212,175,55,0.2)] transition-all duration-300 cursor-pointer"
+                      onClick={() => navigate(`/product/${product.id}`)}
+                    >
+                      <div className="relative overflow-hidden rounded-t-lg">
+                        <img
+                          src={product.images[0] || "/placeholder.svg"}
+                          alt={product.name}
+                          className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                        {product.brands && (
+                          <Badge className="absolute top-3 right-3 bg-[#d4af37] text-black font-semibold shadow-md">
+                            {product.brands.name}
+                          </Badge>
+                        )}
+                      </div>
+                      <CardContent className="p-5">
+                        <h3 className="font-semibold text-lg text-white mb-2 line-clamp-2">
+                          {product.name}
+                        </h3>
+                        <p className="text-2xl font-bold text-[#d4af37]">
+                          ${product.price}
+                        </p>
+                      </CardContent>
+                      <CardFooter className="p-5 pt-0">
+                      {quantity > 0 ? (
+                        <div className="flex items-center justify-between w-full bg-[#d4af37] text-black rounded-xl px-4 py-3 font-semibold h-[50px]">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-black hover:bg-[#b8972f] px-3 h-full"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              decreaseQuantity(product.id);
+                            }}
+                          >
+                            –
+                          </Button>
+                          <span className="text-lg font-semibold">{quantity}</span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-black hover:bg-[#b8972f] px-3 h-full"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              increaseQuantity(product.id);
+                            }}
+                          >
+                            +
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button
+                          className="w-full bg-[#d4af37] text-black hover:bg-[#b8972f] font-semibold transition-all rounded-xl h-[50px]"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            addToCart(product);
+                          }}
+                        >
+                          <ShoppingCart className="mr-2 h-4 w-4" />
+                          Саватга қўшиш
+                        </Button>
                       )}
-                    </div>
-                    <CardContent className="p-5">
-                      <h3 className="font-semibold text-lg text-white mb-2 line-clamp-2">
-                        {product.name}
-                      </h3>
-                      <p className="text-2xl font-bold text-[#d4af37]">
-                        ${product.price}
-                      </p>
-                    </CardContent>
-                    <CardFooter className="p-5 pt-0">
-                      <Button
-                        className="w-full bg-[#d4af37] text-black hover:bg-[#b8972f] font-semibold transition-all"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          addToCart(product);
-                        }}
-                      >
-                        <ShoppingCart className="mr-2 h-4 w-4" />
-                        Саватга қўшиш
-                      </Button>
                     </CardFooter>
-                  </Card>
-                ))}
+
+                    </Card>
+                  );
+                })}
               </div>
             )}
           </div>
