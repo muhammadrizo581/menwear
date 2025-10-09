@@ -21,7 +21,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Upload } from "lucide-react";
+import { Plus, Pencil, Trash2, Upload, X } from "lucide-react";
 
 export const ProductsManager = () => {
   const [products, setProducts] = useState<any[]>([]);
@@ -57,6 +57,7 @@ export const ProductsManager = () => {
     setBrands(brandsData || []);
   };
 
+  // === RASM YUKLASH ===
   const handleUpload = async () => {
     if (!files || files.length === 0) return [];
     setUploading(true);
@@ -64,8 +65,12 @@ export const ProductsManager = () => {
 
     for (const file of Array.from(files)) {
       const fileExt = file.name.split(".").pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const { data, error } = await supabase.storage.from("product-images").upload(fileName, file);
+      const fileName = `${Date.now()}-${Math.random()
+        .toString(36)
+        .substring(2)}.${fileExt}`;
+      const { data, error } = await supabase.storage
+        .from("product-images")
+        .upload(fileName, file);
 
       if (error) {
         toast.error("Расм юклашда хатолик");
@@ -84,8 +89,10 @@ export const ProductsManager = () => {
     return uploadedUrls;
   };
 
+  // === FORM SUBMIT ===
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     let uploadedUrls: string[] = formData.images || [];
     if (files && files.length > 0) {
       const urls = await handleUpload();
@@ -104,7 +111,10 @@ export const ProductsManager = () => {
     };
 
     if (editing) {
-      const { error } = await supabase.from("products").update(productData).eq("id", editing.id);
+      const { error } = await supabase
+        .from("products")
+        .update(productData)
+        .eq("id", editing.id);
       if (error) toast.error("Хатолик юз берди");
       else {
         toast.success("Маҳсулот янгиланди ✏️");
@@ -120,6 +130,14 @@ export const ProductsManager = () => {
         loadData();
       }
     }
+  };
+
+  // === RASM O‘CHIRISH ===
+  const handleRemoveImage = (url: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      images: prev.images.filter((img) => img !== url),
+    }));
   };
 
   const handleEdit = (product: any) => {
@@ -202,7 +220,10 @@ export const ProductsManager = () => {
               <Label className="text-[#d4af37]">Тавсиф</Label>
               <Textarea
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                required
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
                 className="bg-[#111] border-[#333] focus:border-[#d4af37] text-white"
               />
             </div>
@@ -212,7 +233,9 @@ export const ProductsManager = () => {
                 <Label className="text-[#d4af37]">Категория</Label>
                 <Select
                   value={formData.category_id}
-                  onValueChange={(value) => setFormData({ ...formData, category_id: value })}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, category_id: value })
+                  }
                 >
                   <SelectTrigger className="bg-[#111] border-[#333] text-white">
                     <SelectValue placeholder="Танланг" />
@@ -231,7 +254,9 @@ export const ProductsManager = () => {
                 <Label className="text-[#d4af37]">Бренд</Label>
                 <Select
                   value={formData.brand_id}
-                  onValueChange={(value) => setFormData({ ...formData, brand_id: value })}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, brand_id: value })
+                  }
                 >
                   <SelectTrigger className="bg-[#111] border-[#333] text-white">
                     <SelectValue placeholder="Танланг" />
@@ -250,6 +275,7 @@ export const ProductsManager = () => {
             <div>
               <Label className="text-[#d4af37]">Ўлчамлар (вергул билан)</Label>
               <Input
+                required
                 value={formData.sizes}
                 onChange={(e) => setFormData({ ...formData, sizes: e.target.value })}
                 placeholder="S, M, L, XL"
@@ -257,10 +283,12 @@ export const ProductsManager = () => {
               />
             </div>
 
+            {/* === RASM QISMI === */}
             <div>
               <Label className="text-[#d4af37]">Расмлар</Label>
               <Input
                 type="file"
+                required
                 multiple
                 onChange={(e) => setFiles(e.target.files)}
                 className="bg-[#111] border-[#333] text-white"
@@ -268,12 +296,20 @@ export const ProductsManager = () => {
               {formData.images.length > 0 && (
                 <div className="flex flex-wrap gap-3 mt-3">
                   {formData.images.map((url, i) => (
-                    <img
-                      key={i}
-                      src={url}
-                      alt="preview"
-                      className="w-20 h-20 rounded-lg object-cover border border-[#2a2a2a]"
-                    />
+                    <div key={i} className="relative group">
+                      <img
+                        src={url}
+                        alt="preview"
+                        className="w-20 h-20 rounded-lg object-cover border border-[#2a2a2a]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveImage(url)}
+                        className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
                   ))}
                 </div>
               )}
@@ -318,7 +354,9 @@ export const ProductsManager = () => {
       {/* PRODUCT LIST TABLE */}
       <Card className="bg-[#1a1a1a]/90 border border-[#2a2a2a] shadow-[0_0_20px_rgba(212,175,55,0.1)] backdrop-blur-md">
         <CardHeader className="border-b border-[#2a2a2a]">
-          <CardTitle className="text-[#d4af37] text-2xl font-bold">📦 Маҳсулотлар рўйхати</CardTitle>
+          <CardTitle className="text-[#d4af37] text-2xl font-bold">
+            📦 Маҳсулотлар рўйхати
+          </CardTitle>
         </CardHeader>
         <CardContent className="overflow-x-auto mt-4">
           <Table>
@@ -336,7 +374,7 @@ export const ProductsManager = () => {
               {products.map((product) => (
                 <TableRow
                   key={product.id}
-                  className="border-[#2a2a2a] hover:bg-[#222] transition-all"
+                  className="border-[#2a2a2a] hover:bg-[#222] transition-all text-[#d4af37]"
                 >
                   <TableCell>{product.name}</TableCell>
                   <TableCell>${product.price}</TableCell>
