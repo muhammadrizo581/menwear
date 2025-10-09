@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, User, LogOut } from "lucide-react";
+import { ShoppingCart, User, LogOut, Menu } from "lucide-react";
 import { Button } from "./ui/button";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -37,84 +37,111 @@ const Layout = ({ children }: LayoutProps) => {
   return (
     <div className="min-h-screen flex flex-col bg-[#0c0c0c] text-white">
       {/* HEADER */}
-      <header className="sticky top-0 z-50 border-b border-[#2a2a2a] bg-[#0c0c0c]/95 backdrop-blur">
-        <div className="container flex h-16 items-center justify-between px-4 md:px-8">
-          {/* LOGO */}
-          <Link to="/" className="flex items-center space-x-3">
-            <img
-              src="/logo.jpeg"
-              alt="Menwear Logo"
-              className="h-8 w-auto drop-shadow-lg"
-            />
-            <span className="text-2xl font-bold text-[#d4af37] tracking-wide">
-              MENWEAR.UZ
-            </span>
-          </Link>
+{/* HEADER */}
+<header className="sticky top-0 z-50 border-b border-[#2a2a2a] bg-[#0c0c0c]/95 backdrop-blur">
+  <div className="container flex h-16 items-center justify-between px-4 md:px-8">
+    
+    {/* MOBILE LOGO (faqat mobilda chiqadi) */}
+    <Link
+      to="/"
+      className="flex items-center space-x-2 md:hidden"
+    >
+      <img
+        src="/logo.jpeg"
+        alt="Menwear Logo"
+        className="h-8 w-auto rounded-full"
+      />
+      <span className="hidden md:block text-[#d4af37] font-bold">MENWEAR.UZ</span>
+    </Link>
 
-          {/* NAVIGATION */}
-          <nav className="hidden md:flex items-center space-x-6">
-            {[
-              { name: "Категориялар", path: "/categories" },
-              { name: "Брендлар", path: "/brands" },
-              { name: "Биз ҳақимизда", path: "/about" },
-              { name: "Алоқа", path: "/contact" },
-            ].map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className="text-sm text-gray-300 hover:text-[#d4af37] transition-colors duration-200"
-              >
-                {item.name}
-              </Link>
-            ))}
-          </nav>
+    {/* DESKTOP LOGO (faqat md va undan katta ekranlarda chiqadi) */}
+    <div className="hidden md:flex items-center space-x-2">
+      <img
+        src="/logo.jpeg"
+        alt="Menwear Logo"
+        className="h-8 w-auto rounded-full"
+      />
+      <span className="hidden md:inline-block text-[#d4af37] font-bold">
+        MENWEAR.UZ
+      </span>
+    </div>
 
-          {/* ACTION BUTTONS */}
-          <div className="flex items-center space-x-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate("/cart")}
-              className="relative text-gray-300 hover:text-[#d4af37] hover:bg-transparent"
-            >
-              <ShoppingCart className="h-5 w-5" />
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-[#d4af37] text-black text-xs flex items-center justify-center">
-                  {cartCount}
-                </span>
-              )}
-            </Button>
+    {/* NAVIGATION (desktop uchun) */}
+    <nav className="hidden md:flex items-center space-x-8 mx-auto">
+      {[
+        { name: "Категориялар", path: "/categories" },
+        { name: "Брендлар", path: "/brands" },
+        { name: "Биз ҳақимизда", path: "/about" },
+        { name: "Алоқа", path: "/contact" },
+      ].map((item) => (
+        <Link
+          key={item.path}
+          to={item.path}
+          className="text-sm text-gray-300 hover:text-[#d4af37] transition-colors duration-200"
+        >
+          {item.name}
+        </Link>
+      ))}
+    </nav>
 
-            {user ? (
-              <>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => navigate("/profile")}
-                  className="text-gray-300 hover:text-[#d4af37] hover:bg-transparent"
-                >
-                  <User className="h-5 w-5" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleLogout}
-                  className="text-gray-300 hover:text-[#d4af37] hover:bg-transparent"
-                >
-                  <LogOut className="h-5 w-5" />
-                </Button>
-              </>
-            ) : (
-              <Button
-                onClick={() => navigate("/auth")}
-                className="bg-[#d4af37] text-black hover:bg-[#b8972f]"
-              >
-                Кириш
-              </Button>
-            )}
-          </div>
-        </div>
-      </header>
+    {/* ACTION BUTTONS */}
+    <div className="flex items-center space-x-4">
+      {/* CART */}
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => navigate("/cart")}
+        className="relative text-gray-300 hover:text-[#d4af37] hover:bg-transparent"
+      >
+        <ShoppingCart className="h-5 w-5" />
+        {cartCount > 0 && (
+          <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-[#d4af37] text-black text-xs flex items-center justify-center">
+            {cartCount}
+          </span>
+        )}
+      </Button>
+
+      {/* AUTH */}
+      {user ? (
+        <>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate("/profile")}
+            className="text-gray-300 hover:text-[#d4af37] hover:bg-transparent"
+          >
+            <User className="h-5 w-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleLogout}
+            className="text-gray-300 hover:text-[#d4af37] hover:bg-transparent"
+          >
+            <LogOut className="h-5 w-5" />
+          </Button>
+        </>
+      ) : (
+        <Button
+          onClick={() => navigate("/auth")}
+          className="bg-[#d4af37] text-black hover:bg-[#b8972f]"
+        >
+          Кириш
+        </Button>
+      )}
+
+      {/* MOBILE MENU ICON */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="md:hidden text-gray-300 hover:text-[#d4af37]"
+      >
+        <Menu className="h-6 w-6" />
+      </Button>
+    </div>
+  </div>
+</header>
+
 
       {/* MAIN CONTENT */}
       <main className="flex-1">{children}</main>
@@ -128,7 +155,7 @@ const Layout = ({ children }: LayoutProps) => {
                 <img
                   src="/logo.jpeg"
                   alt="Menwear Logo"
-                  className="h-8 w-auto"
+                  className="h-8 w-auto rounded-full"
                 />
                 <span className="text-xl font-semibold text-[#d4af37]">
                   MENWEAR.UZ
