@@ -90,7 +90,7 @@ const Admin = () => {
         <h1 className="text-4xl font-bold mb-8 text-center">Админ панели</h1>
 
         <Tabs defaultValue="products" className="w-full">
-          <TabsList className="grid grid-cols-4 w-full bg-muted/50 rounded-lg p-1 mb-8">
+          <TabsList className="grid grid-cols-4 w-full bg-muted/5 rounded-lg p-1 mb-8 text-white">
             <TabsTrigger value="products">🛍 Маҳсулотлар</TabsTrigger>
             <TabsTrigger value="categories">📂 Категориялар</TabsTrigger>
             <TabsTrigger value="brands">🏷️ Брендлар</TabsTrigger>
