@@ -59,22 +59,15 @@ export const ProductsManager = () => {
 
   const handleUpload = async () => {
     if (!files || files.length === 0) return [];
-
     setUploading(true);
     const uploadedUrls: string[] = [];
 
     for (const file of Array.from(files)) {
       const fileExt = file.name.split(".").pop();
-      const fileName = `${Date.now()}-${Math.random()
-        .toString(36)
-        .substring(2)}.${fileExt}`;
-
-      const { data, error } = await supabase.storage
-        .from("product-images")
-        .upload(fileName, file);
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const { data, error } = await supabase.storage.from("product-images").upload(fileName, file);
 
       if (error) {
-        console.error(error);
         toast.error("Расм юклашда хатолик");
         continue;
       }
@@ -83,19 +76,16 @@ export const ProductsManager = () => {
         .from("product-images")
         .getPublicUrl(data.path);
 
-      if (publicData?.publicUrl) {
-        uploadedUrls.push(publicData.publicUrl);
-      }
+      if (publicData?.publicUrl) uploadedUrls.push(publicData.publicUrl);
     }
 
     setUploading(false);
-    toast.success("Расмлар муваффақиятли юкланди");
+    toast.success("Расмлар юкланди ✅");
     return uploadedUrls;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     let uploadedUrls: string[] = formData.images || [];
     if (files && files.length > 0) {
       const urls = await handleUpload();
@@ -117,7 +107,7 @@ export const ProductsManager = () => {
       const { error } = await supabase.from("products").update(productData).eq("id", editing.id);
       if (error) toast.error("Хатолик юз берди");
       else {
-        toast.success("Маҳсулот янгиланди");
+        toast.success("Маҳсулот янгиланди ✏️");
         resetForm();
         loadData();
       }
@@ -125,7 +115,7 @@ export const ProductsManager = () => {
       const { error } = await supabase.from("products").insert(productData);
       if (error) toast.error("Хатолик юз берди");
       else {
-        toast.success("Маҳсулот қўшилди");
+        toast.success("Маҳсулот қўшилди ✅");
         resetForm();
         loadData();
       }
@@ -151,7 +141,7 @@ export const ProductsManager = () => {
       const { error } = await supabase.from("products").delete().eq("id", id);
       if (error) toast.error("Хатолик юз берди");
       else {
-        toast.success("Маҳсулот ўчирилди");
+        toast.success("Маҳсулот ўчирилди 🗑️");
         loadData();
       }
     }
@@ -173,35 +163,28 @@ export const ProductsManager = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0c0c0c] text-white p-6 space-y-8">
-      <Card className="bg-[#1a1a1a] border border-[#2a2a2a] shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-[#d4af37] text-xl font-bold">
-            {editing ? "Маҳсулотни таҳрирлаш" : "Янги маҳсулот қўшиш"}
+    <div className="min-h-screen bg-gradient-to-br from-[#0b0b0b] via-[#141414] to-[#0b0b0b] text-white p-8 space-y-10">
+      {/* FORM CARD */}
+      <Card className="bg-[#1a1a1a]/90 border border-[#2a2a2a] backdrop-blur-md shadow-[0_0_25px_rgba(212,175,55,0.08)] hover:shadow-[0_0_40px_rgba(212,175,55,0.15)] transition-all">
+        <CardHeader className="pb-2 border-b border-[#2a2a2a]">
+          <CardTitle className="text-[#d4af37] text-2xl font-bold tracking-tight flex items-center gap-2">
+            {editing ? "✏️ Маҳсулотни таҳрирлаш" : "➕ Янги маҳсулот қўшиш"}
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Label className="text-[#d4af37]">Номи</Label>
-              <Input
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                required
-                className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-              />
-            </div>
 
-            <div>
-              <Label className="text-[#d4af37]">Тавсиф</Label>
-              <Textarea
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-              />
-            </div>
+        <CardContent className="pt-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <Label className="text-[#d4af37]">Номи</Label>
+                <Input
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  required
+                  className="bg-[#111] border-[#333] focus:border-[#d4af37] text-white"
+                />
+              </div>
 
-            <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label className="text-[#d4af37]">Нарх ($)</Label>
                 <Input
@@ -210,17 +193,28 @@ export const ProductsManager = () => {
                   value={formData.price}
                   onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                   required
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  className="bg-[#111] border-[#333] focus:border-[#d4af37] text-white"
                 />
               </div>
+            </div>
 
+            <div>
+              <Label className="text-[#d4af37]">Тавсиф</Label>
+              <Textarea
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                className="bg-[#111] border-[#333] focus:border-[#d4af37] text-white"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
                 <Label className="text-[#d4af37]">Категория</Label>
                 <Select
                   value={formData.category_id}
                   onValueChange={(value) => setFormData({ ...formData, category_id: value })}
                 >
-                  <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                  <SelectTrigger className="bg-[#111] border-[#333] text-white">
                     <SelectValue placeholder="Танланг" />
                   </SelectTrigger>
                   <SelectContent className="bg-[#1a1a1a] text-white border-[#2a2a2a]">
@@ -232,47 +226,25 @@ export const ProductsManager = () => {
                   </SelectContent>
                 </Select>
               </div>
-            </div>
 
-            <div>
-              <Label className="text-[#d4af37]">Бренд</Label>
-              <Select
-                value={formData.brand_id}
-                onValueChange={(value) => setFormData({ ...formData, brand_id: value })}
-              >
-                <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
-                  <SelectValue placeholder="Танланг" />
-                </SelectTrigger>
-                <SelectContent className="bg-[#1a1a1a] text-white border-[#2a2a2a]">
-                  {brands.map((brand) => (
-                    <SelectItem key={brand.id} value={brand.id}>
-                      {brand.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label className="text-[#d4af37]">Расмлар</Label>
-              <Input
-                type="file"
-                multiple
-                onChange={(e) => setFiles(e.target.files)}
-                className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-              />
-              {formData.images.length > 0 && (
-                <div className="flex gap-2 mt-2 flex-wrap">
-                  {formData.images.map((url, i) => (
-                    <img
-                      key={i}
-                      src={url}
-                      alt="preview"
-                      className="w-16 h-16 object-cover rounded border border-[#2a2a2a]"
-                    />
-                  ))}
-                </div>
-              )}
+              <div>
+                <Label className="text-[#d4af37]">Бренд</Label>
+                <Select
+                  value={formData.brand_id}
+                  onValueChange={(value) => setFormData({ ...formData, brand_id: value })}
+                >
+                  <SelectTrigger className="bg-[#111] border-[#333] text-white">
+                    <SelectValue placeholder="Танланг" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#1a1a1a] text-white border-[#2a2a2a]">
+                    {brands.map((brand) => (
+                      <SelectItem key={brand.id} value={brand.id}>
+                        {brand.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             <div>
@@ -281,33 +253,59 @@ export const ProductsManager = () => {
                 value={formData.sizes}
                 onChange={(e) => setFormData({ ...formData, sizes: e.target.value })}
                 placeholder="S, M, L, XL"
-                className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                className="bg-[#111] border-[#333] focus:border-[#d4af37] text-white"
               />
             </div>
 
-            <div className="flex gap-4">
+            <div>
+              <Label className="text-[#d4af37]">Расмлар</Label>
+              <Input
+                type="file"
+                multiple
+                onChange={(e) => setFiles(e.target.files)}
+                className="bg-[#111] border-[#333] text-white"
+              />
+              {formData.images.length > 0 && (
+                <div className="flex flex-wrap gap-3 mt-3">
+                  {formData.images.map((url, i) => (
+                    <img
+                      key={i}
+                      src={url}
+                      alt="preview"
+                      className="w-20 h-20 rounded-lg object-cover border border-[#2a2a2a]"
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center gap-4 pt-4">
               <Button
                 type="submit"
-                className="bg-[#d4af37] text-black hover:bg-[#b8972f] font-semibold"
+                className="bg-[#d4af37] text-black hover:bg-[#c39c2e] font-semibold px-6 py-2 rounded-lg shadow-md"
                 disabled={uploading}
               >
                 {uploading ? (
                   <>
                     <Upload className="w-4 h-4 mr-2 animate-spin" /> Юкланмоқда...
                   </>
+                ) : editing ? (
+                  <>
+                    <Pencil className="w-4 h-4 mr-2" /> Янгилаш
+                  </>
                 ) : (
                   <>
-                    <Plus className="w-4 h-4 mr-2" />
-                    {editing ? "Янгилаш" : "Қўшиш"}
+                    <Plus className="w-4 h-4 mr-2" /> Қўшиш
                   </>
                 )}
               </Button>
+
               {editing && (
                 <Button
                   type="button"
                   variant="outline"
                   onClick={resetForm}
-                  className="border-[#d4af37] text-[#d4af37] hover:bg-[#d4af3715]"
+                  className="border-[#d4af37] text-[#d4af37] hover:bg-[#d4af3720] px-6 py-2 rounded-lg"
                 >
                   Бекор қилиш
                 </Button>
@@ -317,28 +315,29 @@ export const ProductsManager = () => {
         </CardContent>
       </Card>
 
-      {/* Product list table */}
-      <Card className="bg-[#1a1a1a] border border-[#2a2a2a] shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-[#d4af37] text-xl font-bold">
-            Маҳсулотлар рўйхати
-          </CardTitle>
+      {/* PRODUCT LIST TABLE */}
+      <Card className="bg-[#1a1a1a]/90 border border-[#2a2a2a] shadow-[0_0_20px_rgba(212,175,55,0.1)] backdrop-blur-md">
+        <CardHeader className="border-b border-[#2a2a2a]">
+          <CardTitle className="text-[#d4af37] text-2xl font-bold">📦 Маҳсулотлар рўйхати</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="overflow-x-auto mt-4">
           <Table>
             <TableHeader>
-              <TableRow className="border-[#2a2a2a]">
-                <TableHead className="text-[#d4af37]">Номи</TableHead>
+              <TableRow className="border-[#2a2a2a] bg-[#111]">
+                <TableHead className="text-[#d4af37] font-semibold">Номи</TableHead>
                 <TableHead className="text-[#d4af37]">Нарх</TableHead>
                 <TableHead className="text-[#d4af37]">Категория</TableHead>
                 <TableHead className="text-[#d4af37]">Бренд</TableHead>
                 <TableHead className="text-[#d4af37]">Расмлар</TableHead>
-                <TableHead className="text-[#d4af37]">Амаллар</TableHead>
+                <TableHead className="text-[#d4af37] text-center">Амаллар</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {products.map((product) => (
-                <TableRow key={product.id} className="border-[#2a2a2a]">
+                <TableRow
+                  key={product.id}
+                  className="border-[#2a2a2a] hover:bg-[#222] transition-all"
+                >
                   <TableCell>{product.name}</TableCell>
                   <TableCell>${product.price}</TableCell>
                   <TableCell>{product.categories?.name || "-"}</TableCell>
@@ -350,13 +349,13 @@ export const ProductsManager = () => {
                           key={i}
                           src={url}
                           alt="thumb"
-                          className="w-10 h-10 rounded object-cover"
+                          className="w-10 h-10 rounded object-cover border border-[#2a2a2a]"
                         />
                       ))}
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="flex gap-2">
+                    <div className="flex justify-center gap-2">
                       <Button
                         size="sm"
                         variant="outline"

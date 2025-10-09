@@ -57,7 +57,10 @@ const Cart = () => {
     updateCart(updated);
   };
 
-  const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const total = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
 
   const handleCheckout = () => {
     if (!user) {
@@ -103,13 +106,20 @@ const Cart = () => {
                   className="bg-zinc-900 border border-zinc-800 hover:border-primary/40 transition-all"
                 >
                   <CardContent className="p-4 flex items-center gap-4">
+                    {/* IMAGE + LINK */}
                     <img
                       src={item.image}
                       alt={item.name}
-                      className="w-24 h-24 object-cover rounded-xl border border-zinc-700"
+                      className="w-24 h-24 object-cover rounded-xl border border-zinc-700 cursor-pointer hover:opacity-80 transition"
+                      onClick={() => navigate(`/product/${item.id}`)}
                     />
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-100">{item.name}</h3>
+                      <h3
+                        className="font-semibold text-gray-100 cursor-pointer hover:text-primary transition"
+                        onClick={() => navigate(`/product/${item.id}`)}
+                      >
+                        {item.name}
+                      </h3>
                       <div className="flex items-center gap-3 mt-2">
                         <Button
                           variant="ghost"
