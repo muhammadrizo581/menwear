@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, User, LogOut, Menu } from "lucide-react";
+import { ShoppingCart, User, LogOut } from "lucide-react";
 import { Button } from "./ui/button";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -130,14 +130,7 @@ const Layout = ({ children }: LayoutProps) => {
         </Button>
       )}
 
-      {/* MOBILE MENU ICON */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="md:hidden text-gray-300 hover:text-[#d4af37]"
-      >
-        <Menu className="h-6 w-6" />
-      </Button>
+      
     </div>
   </div>
 </header>
@@ -172,11 +165,7 @@ const Layout = ({ children }: LayoutProps) => {
                 Саҳифалар
               </h3>
               <ul className="space-y-2 text-sm">
-                <li>
-                  <Link to="/" className="text-gray-400 hover:text-[#d4af37]">
-                    Бош саҳифа
-                  </Link>
-                </li>
+                
                 <li>
                   <Link
                     to="/categories"

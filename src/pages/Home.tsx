@@ -117,7 +117,6 @@ const Home = () => {
 
   // Links for mobile menu
   const pages = [
-    { name: "Бош саҳифа", path: "/" },
     { name: "Категориялар", path: "/categories" },
     { name: "Брендлар", path: "/brands" },
     { name: "Сават", path: "/cart" },
@@ -127,13 +126,13 @@ const Home = () => {
   return (
     <Layout>
       {/* MOBILE HAMBURGER BUTTON (only on small screens) */}
-      <div className="md:hidden fixed top-4 left-4 z-50">
+      <div className="md:hidden fixed top-4 left-4 z-50 mt-[-10px]">
         <button
           onClick={() => setMenuOpen(true)}
           aria-label="Open menu"
           className="p-3 bg-[#1a1a1a]/95 border border-[#2a2a2a] rounded-xl shadow-md text-[#d4af37]"
         >
-          <Menu className="w-6 h-6" />
+          <Menu className="w-6 h-6 " />
         </button>
       </div>
 
@@ -172,7 +171,7 @@ const Home = () => {
                 </button>
               </div>
 
-              <nav className="p-6 flex flex-col gap-4">
+              <nav className="p-6 flex flex-col gap-4 ">
                 {pages.map((p) => (
                   <button
                     key={p.path}
