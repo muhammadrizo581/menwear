@@ -200,15 +200,25 @@ const Home = () => {
           <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#111] via-[#2a2a2a] to-[#0c0c0c] p-12 mb-16 border border-[#2a2a2a] shadow-[0_0_25px_rgba(212,175,55,0.15)]">
             <div className="relative z-10">
               {/* Desktop logo + title (hidden on small screens) */}
-              <div className="hidden md:flex items-center gap-3 mb-4">
+              <div className="flex gap-3">
+                <div className="hidden md:flex items-center gap-3 mb-4">
                 <img src="/logo.jpeg" alt="Menwear Logo" className="h-16" />
               </div>
 
-              <h1 className="text-5xl md:text-6xl font-extrabold text-[#d4af37] mb-4 tracking-tight">MENWEAR.UZ</h1>
-              <p className="text-lg md:text-xl text-gray-300 mb-8 max-w-xl">
+              <h1 className="text-[24px] sm:text-5xl md:text-6xl font-extrabold text-[#d4af37] mb-4 tracking-tight">
+                  MENWEAR.UZ
+              </h1>
+              </div>
+
+              <p className="text-sm sm:text-base md:text-xl text-gray-300 mb-6 sm:mb-8 max-w-xl leading-relaxed">
                 Хитойдан сифатли эркаклар кийимлари — ҳар бир нарсада шукўҳ ва услуб.
               </p>
-              <Button size="lg" className="bg-[#d4af37] text-black hover:bg-[#b8972f] font-semibold rounded-full px-8 py-6 text-lg shadow-lg" onClick={() => document.getElementById("products")?.scrollIntoView({ behavior: "smooth" })}>
+
+              <Button
+                size="lg"
+                className="text-sm sm:text-base md:text-lg bg-[#d4af37] text-black hover:bg-[#b8972f] font-semibold rounded-full px-6 sm:px-8 py-4 sm:py-6 shadow-lg transition-all"
+                onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
+              >
                 Маҳсулотларни кўриш
               </Button>
             </div>

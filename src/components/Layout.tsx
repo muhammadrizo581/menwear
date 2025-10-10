@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { ShoppingCart, User, LogOut } from "lucide-react";
 import { Button } from "./ui/button";
 import { useEffect, useState } from "react";
@@ -54,8 +54,9 @@ const Layout = ({ children }: LayoutProps) => {
       <span className="hidden md:block text-[#d4af37] font-bold">MENWEAR.UZ</span>
     </Link>
 
-    {/* DESKTOP LOGO (faqat md va undan katta ekranlarda chiqadi) */}
-    <div className="hidden md:flex items-center space-x-2">
+          {/* DESKTOP LOGO (faqat md va undan katta ekranlarda chiqadi) */}
+          <NavLink to="/">
+    <div  className="hidden md:flex items-center space-x-2">
       <img
         src="/logo.jpeg"
         alt="Menwear Logo"
@@ -65,7 +66,7 @@ const Layout = ({ children }: LayoutProps) => {
         MENWEAR.UZ
       </span>
     </div>
-
+    </NavLink>
     {/* NAVIGATION (desktop uchun) */}
     <nav className="hidden md:flex items-center space-x-8 mx-auto">
       {[
