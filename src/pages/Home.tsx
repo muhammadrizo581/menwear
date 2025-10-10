@@ -35,7 +35,6 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [cart, setCart] = useState<any[]>([]);
-
   // Mobile menu state (integrated on this page)
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -117,6 +116,7 @@ const Home = () => {
 
   // Links for mobile menu
   const pages = [
+    { name: "Бош сахифа", path: "/" },
     { name: "Категориялар", path: "/categories" },
     { name: "Брендлар", path: "/brands" },
     { name: "Сават", path: "/cart" },
@@ -195,7 +195,7 @@ const Home = () => {
 
       {/* PAGE CONTENT */}
       <div className="min-h-screen bg-[#0c0c0c] text-white">
-        <div className="container py-10">
+        <div className="w-full mx-auto px-0 py-10 lg:container">
           {/* HERO */}
           <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#111] via-[#2a2a2a] to-[#0c0c0c] p-12 mb-16 border border-[#2a2a2a] shadow-[0_0_25px_rgba(212,175,55,0.15)]">
             <div className="relative z-10">
@@ -257,7 +257,7 @@ const Home = () => {
                         <p className="text-2xl font-bold text-[#d4af37]">${product.price}</p>
                       </CardContent>
 
-                      <CardFooter className="p-5 pt-0">
+                      <CardFooter className="p-2 pt-0">
                         {quantity > 0 ? (
                           <div className="flex items-center justify-between w-full bg-[#d4af37] text-black rounded-xl px-4 py-3 font-semibold h-[50px]">
                             <button onClick={(e) => { e.stopPropagation(); decreaseQuantity(product.id); }} className="text-black px-3 h-full">–</button>
@@ -265,8 +265,8 @@ const Home = () => {
                             <button onClick={(e) => { e.stopPropagation(); increaseQuantity(product.id); }} className="text-black px-3 h-full">+</button>
                           </div>
                         ) : (
-                          <Button className="w-full bg-[#d4af37] text-black hover:bg-[#b8972f] font-semibold transition-all rounded-xl h-[50px]" onClick={(e) => { e.stopPropagation(); addToCart(product); }}>
-                            <ShoppingCart className="mr-2 h-4 w-4" /> Саватга қўшиш
+                          <Button className="flex gap-0 w-full bg-[#d4af37] text-black hover:bg-[#b8972f] text-[12px] font-semibold transition-all rounded-xl h-[50px]" onClick={(e) => { e.stopPropagation(); addToCart(product); }}>
+                            <ShoppingCart className="mr-2 h-4 w-4" /> <span>Саватга қўшиш</span>
                           </Button>
                         )}
                       </CardFooter>
