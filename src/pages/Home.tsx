@@ -171,7 +171,7 @@ const Home = () => {
                 </button>
               </div>
 
-              <nav className="p-6 flex flex-col gap-4 ">
+              <nav className="p-6 flex flex-col gap-4">
                 {pages.map((p) => (
                   <button
                     key={p.path}
@@ -183,8 +183,8 @@ const Home = () => {
                 ))}
 
                 <div className="mt-6">
-                  <button onClick={() => { setMenuOpen(false); navigate('/cart'); }} className="w-full bg-[#d4af37] text-black font-semibold py-2 rounded">
-                    Сават
+                  <button onClick={() => { setMenuOpen(false); navigate('/cart'); }} className="flex gap-2 justify-center w-full bg-[#d4af37] text-black font-semibold py-2 rounded">
+                    Сават <ShoppingCart></ShoppingCart>
                   </button>
                 </div>
               </nav>
@@ -228,7 +228,7 @@ const Home = () => {
             <h2 className="text-3xl font-bold text-[#d4af37] mb-8 text-center">Маҳсулотлар</h2>
 
             {loading ? (
-              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {[...Array(8)].map((_, i) => (
                   <Card key={i} className="bg-[#1a1a1a] border-[#2a2a2a] animate-pulse">
                     <div className="h-64 bg-[#2a2a2a] rounded-t-lg" />
@@ -242,7 +242,7 @@ const Home = () => {
             ) : filteredProducts.length === 0 ? (
               <div className="text-center py-20 text-gray-400 text-lg">Маҳсулотлар топилмади 😔</div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                 {filteredProducts.map((product) => {
                   const quantity = getQuantity(product.id);
                   return (
