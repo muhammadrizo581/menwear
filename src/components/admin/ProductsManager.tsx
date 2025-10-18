@@ -309,10 +309,11 @@ return (
                       <button
                         type="button"
                         onClick={() => handleRemoveImage(url)}
-                        className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition"
+                        className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-100 transition hover:scale-110"
                       >
                         <X className="w-3 h-3" />
                       </button>
+
                     </div>
                   ))}
                 </div>
@@ -475,10 +476,11 @@ return (
               size="sm"
               variant="destructive"
               onClick={() => handleDelete(product.id)}
-              className="bg-red-600 hover:bg-red-700 text-white"
+              className="bg-red-600 hover:bg-red-700 text-white opacity-100 md:opacity-0 md:group-hover:opacity-100 transition"
             >
               <Trash2 className="w-4 h-4" />
             </Button>
+
           </div>
         </div>
       ))}
