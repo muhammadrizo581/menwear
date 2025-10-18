@@ -183,26 +183,27 @@ const handleSubmit = async (e: React.FormEvent) => {
     setFiles(null);
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0b0b0b] via-[#141414] to-[#0b0b0b] text-white p-8 space-y-10">
-      {/* FORM CARD */}
+return (
+    <div className="min-h-screen bg-gradient-to-br from-[#0b0b0b] via-[#141414] to-[#0b0b0b] text-white py-4 sm:p-6 md:p-8 space-y-8 md:space-y-10">
+      {/* ==== FORM CARD ==== */}
       <Card className="bg-[#1a1a1a]/90 border border-[#2a2a2a] backdrop-blur-md shadow-[0_0_25px_rgba(212,175,55,0.08)] hover:shadow-[0_0_40px_rgba(212,175,55,0.15)] transition-all">
         <CardHeader className="pb-2 border-b border-[#2a2a2a]">
-          <CardTitle className="text-[#d4af37] text-2xl font-bold tracking-tight flex items-center gap-2">
+          <CardTitle className="text-[#d4af37] text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
             {editing ? "✏️ Маҳсулотни таҳрирлаш" : "➕ Янги маҳсулот қўшиш"}
           </CardTitle>
         </CardHeader>
 
         <CardContent className="pt-6">
           <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {/* === GRID FIELDS === */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
               <div>
                 <Label className="text-[#d4af37]">Номи</Label>
                 <Input
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
-                  className="bg-[#111] border-[#333] focus:border-[#d4af37] text-white"
+                  className="bg-[#111] border-[#333] focus:border-[#d4af37] text-white text-sm sm:text-base"
                 />
               </div>
 
@@ -214,24 +215,24 @@ const handleSubmit = async (e: React.FormEvent) => {
                   value={formData.price}
                   onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                   required
-                  className="bg-[#111] border-[#333] focus:border-[#d4af37] text-white"
+                  className="bg-[#111] border-[#333] focus:border-[#d4af37] text-white text-sm sm:text-base"
                 />
               </div>
             </div>
 
+            {/* === DESCRIPTION === */}
             <div>
               <Label className="text-[#d4af37]">Тавсиф</Label>
               <Textarea
                 value={formData.description}
                 required
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
-                className="bg-[#111] border-[#333] focus:border-[#d4af37] text-white"
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                className="bg-[#111] border-[#333] focus:border-[#d4af37] text-white text-sm sm:text-base"
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {/* === SELECTS === */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
               <div>
                 <Label className="text-[#d4af37]">Категория</Label>
                 <Select
@@ -240,7 +241,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                     setFormData({ ...formData, category_id: value })
                   }
                 >
-                  <SelectTrigger className="bg-[#111] border-[#333] text-white">
+                  <SelectTrigger className="bg-[#111] border-[#333] text-white text-sm sm:text-base">
                     <SelectValue placeholder="Танланг" />
                   </SelectTrigger>
                   <SelectContent className="bg-[#1a1a1a] text-white border-[#2a2a2a]">
@@ -261,7 +262,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                     setFormData({ ...formData, brand_id: value })
                   }
                 >
-                  <SelectTrigger className="bg-[#111] border-[#333] text-white">
+                  <SelectTrigger className="bg-[#111] border-[#333] text-white text-sm sm:text-base">
                     <SelectValue placeholder="Танланг" />
                   </SelectTrigger>
                   <SelectContent className="bg-[#1a1a1a] text-white border-[#2a2a2a]">
@@ -275,6 +276,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               </div>
             </div>
 
+            {/* === SIZES === */}
             <div>
               <Label className="text-[#d4af37]">Ўлчамлар (вергул билан)</Label>
               <Input
@@ -282,19 +284,18 @@ const handleSubmit = async (e: React.FormEvent) => {
                 value={formData.sizes}
                 onChange={(e) => setFormData({ ...formData, sizes: e.target.value })}
                 placeholder="S, M, L, XL"
-                className="bg-[#111] border-[#333] focus:border-[#d4af37] text-white"
+                className="bg-[#111] border-[#333] focus:border-[#d4af37] text-white text-sm sm:text-base"
               />
             </div>
 
-            {/* === RASM QISMI === */}
+            {/* === IMAGES === */}
             <div>
               <Label className="text-[#d4af37]">Расмлар</Label>
               <Input
-                type="file"
-                required
+                type="file"                
                 multiple
                 onChange={(e) => setFiles(e.target.files)}
-                className="bg-[#111] border-[#333] text-white"
+                className="bg-[#111] border-[#333] text-white text-sm sm:text-base"
               />
               {formData.images.length > 0 && (
                 <div className="flex flex-wrap gap-3 mt-3">
@@ -303,7 +304,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                       <img
                         src={url}
                         alt="preview"
-                        className="w-20 h-20 rounded-lg object-cover border border-[#2a2a2a]"
+                        className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover border border-[#2a2a2a]"
                       />
                       <button
                         type="button"
@@ -318,10 +319,11 @@ const handleSubmit = async (e: React.FormEvent) => {
               )}
             </div>
 
-            <div className="flex items-center gap-4 pt-4">
+            {/* === BUTTONS === */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 pt-4">
               <Button
                 type="submit"
-                className="bg-[#d4af37] text-black hover:bg-[#c39c2e] font-semibold px-6 py-2 rounded-lg shadow-md"
+                className="bg-[#d4af37] text-black hover:bg-[#c39c2e] font-semibold px-5 sm:px-6 py-2 rounded-lg shadow-md text-sm sm:text-base"
                 disabled={uploading}
               >
                 {uploading ? (
@@ -344,7 +346,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   type="button"
                   variant="outline"
                   onClick={resetForm}
-                  className="border-[#d4af37] text-[#d4af37] hover:bg-[#d4af3720] px-6 py-2 rounded-lg"
+                  className="border-[#d4af37] text-[#d4af37] hover:bg-[#d4af3720] px-5 sm:px-6 py-2 rounded-lg text-sm sm:text-base"
                 >
                   Бекор қилиш
                 </Button>
@@ -354,73 +356,137 @@ const handleSubmit = async (e: React.FormEvent) => {
         </CardContent>
       </Card>
 
-      {/* PRODUCT LIST TABLE */}
-      <Card className="bg-[#1a1a1a]/90 border border-[#2a2a2a] shadow-[0_0_20px_rgba(212,175,55,0.1)] backdrop-blur-md">
-        <CardHeader className="border-b border-[#2a2a2a]">
-          <CardTitle className="text-[#d4af37] text-2xl font-bold">
-            📦 Маҳсулотлар рўйхати
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="overflow-x-auto mt-4">
-          <Table>
-            <TableHeader>
-              <TableRow className="border-[#2a2a2a] bg-[#111]">
-                <TableHead className="text-[#d4af37] font-semibold">Номи</TableHead>
-                <TableHead className="text-[#d4af37]">Нарх</TableHead>
-                <TableHead className="text-[#d4af37]">Категория</TableHead>
-                <TableHead className="text-[#d4af37]">Бренд</TableHead>
-                <TableHead className="text-[#d4af37]">Расмлар</TableHead>
-                <TableHead className="text-[#d4af37] text-center">Амаллар</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {products.map((product) => (
-                <TableRow
-                  key={product.id}
-                  className="border-[#2a2a2a] hover:bg-[#222] transition-all text-[#d4af37]"
-                >
-                  <TableCell>{product.name}</TableCell>
-                  <TableCell>${product.price}</TableCell>
-                  <TableCell>{product.categories?.name || "-"}</TableCell>
-                  <TableCell>{product.brands?.name || "-"}</TableCell>
-                  <TableCell>
-                    <div className="flex gap-1 flex-wrap">
-                      {product.images?.map((url: string, i: number) => (
-                        <img
-                          key={i}
-                          src={url}
-                          alt="thumb"
-                          className="w-10 h-10 rounded object-cover border border-[#2a2a2a]"
-                        />
-                      ))}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex justify-center gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleEdit(product)}
-                        className="border-[#d4af37] text-[#d4af37] hover:bg-[#d4af3720]"
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => handleDelete(product.id)}
-                        className="bg-red-600 hover:bg-red-700 text-white"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
+      {/* ==== PRODUCT LIST ==== */}
+      {/* ==== PRODUCT LIST ==== */}
+<Card className="bg-[#1a1a1a]/90 border border-[#2a2a2a] shadow-[0_0_20px_rgba(212,175,55,0.1)] backdrop-blur-md">
+  <CardHeader className="border-b border-[#2a2a2a]">
+    <CardTitle className="text-[#d4af37] text-xl sm:text-2xl font-bold">
+      📦 Маҳсулотлар рўйхати
+    </CardTitle>
+  </CardHeader>
+
+  <CardContent className="mt-4">
+    {/* 🟢 DESKTOP / LARGE TABLE */}
+    <div className="hidden md:block overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow className="border-[#2a2a2a] bg-[#111]">
+            <TableHead className="text-[#d4af37] font-semibold">Номи</TableHead>
+            <TableHead className="text-[#d4af37]">Нарх</TableHead>
+            <TableHead className="text-[#d4af37]">Категория</TableHead>
+            <TableHead className="text-[#d4af37]">Бренд</TableHead>
+            <TableHead className="text-[#d4af37]">Расмлар</TableHead>
+            <TableHead className="text-[#d4af37] text-center">Амаллар</TableHead>
+          </TableRow>
+        </TableHeader>
+
+        <TableBody>
+          {products.map((product) => (
+            <TableRow
+              key={product.id}
+              className="border-[#2a2a2a] hover:bg-[#222] transition-all text-[#d4af37]"
+            >
+              <TableCell>{product.name}</TableCell>
+              <TableCell>${product.price}</TableCell>
+              <TableCell>{product.categories?.name || "-"}</TableCell>
+              <TableCell>{product.brands?.name || "-"}</TableCell>
+              <TableCell>
+                <div className="flex gap-1 flex-wrap">
+                  {product.images?.slice(0, 3).map((url: string, i: number) => (
+                    <img
+                      key={i}
+                      src={url}
+                      alt="thumb"
+                      className="w-10 h-10 rounded object-cover border border-[#2a2a2a]"
+                    />
+                  ))}
+                  {product.images?.length > 3 && (
+                    <span className="text-xs text-[#888]">
+                      +{product.images.length - 3}
+                    </span>
+                  )}
+                </div>
+              </TableCell>
+              <TableCell>
+                <div className="flex justify-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleEdit(product)}
+                    className="border-[#d4af37] text-[#d4af37] hover:bg-[#d4af3720]"
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => handleDelete(product.id)}
+                    className="bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+
+    {/* 🟡 MOBILE / COMPACT CARDS */}
+    <div className="md:hidden flex flex-col gap-4">
+      {products.map((product) => (
+        <div
+          key={product.id}
+          className="bg-[#111] border border-[#2a2a2a] rounded-lg p-4 text-[#d4af37] shadow-md"
+        >
+          <div className="flex justify-between items-center">
+            <h3 className="text-base font-semibold">{product.name}</h3>
+            <span className="text-sm text-[#c1c1c1]">${product.price}</span>
+          </div>
+
+          <p className="text-xs text-[#999] mt-1">
+            {product.categories?.name || "-"} / {product.brands?.name || "-"}
+          </p>
+
+          {product.images?.length > 0 && (
+            <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
+              {product.images.slice(0, 4).map((url: string, i: number) => (
+                <img
+                  key={i}
+                  src={url}
+                  alt="thumb"
+                  className="w-14 h-14 rounded-md object-cover border border-[#2a2a2a] flex-shrink-0"
+                />
               ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+            </div>
+          )}
+
+          <div className="flex justify-end gap-2 mt-3">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleEdit(product)}
+              className="border-[#d4af37] text-[#d4af37] hover:bg-[#d4af3720]"
+            >
+              <Pencil className="w-4 h-4" />
+            </Button>
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={() => handleDelete(product.id)}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      ))}
+    </div>
+  </CardContent>
+</Card>
+
     </div>
   );
 };
+

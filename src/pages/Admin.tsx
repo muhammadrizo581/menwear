@@ -85,44 +85,84 @@ const Admin = () => {
     );
   }
 
-  return (
-    <Layout>
-      <div className="container mx-auto px-4 py-10">
-        <h1 className="text-4xl font-bold mb-8 text-center">Админ панели</h1>
+return (
+  <Layout>
+    <div className="container mx-auto px-4 py-10 text-white">
+      <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center text-[#d4af37]">
+        🛠 Админ панели
+      </h1>
 
-        <Tabs defaultValue="products" className="w-full">
-          <TabsList className="grid grid-cols-5 w-full bg-muted/5 rounded-lg p-1 mb-8 text-white">
-            <TabsTrigger value="products">🛍 Маҳсулотлар</TabsTrigger>
-            <TabsTrigger value="categories">📂 Категориялар</TabsTrigger>
-            <TabsTrigger value="brands">🏷️ Брендлар</TabsTrigger>
-            <TabsTrigger value="orders">📦 Буюртмалар</TabsTrigger>
-            <TabsTrigger value="users">Фойдаланувчилар</TabsTrigger>
+      <Tabs defaultValue="products" className="w-full">
+        {/* ==== TABS LIST ==== */}
+        <div className="mb-6">
+          <TabsList
+            className="
+              flex flex-wrap justify-center gap-2
+              bg-[#1a1a1a]/90 border border-[#2a2a2a]
+              rounded-2xl p-2 shadow-[0_0_10px_rgba(212,175,55,0.1)]
+              backdrop-blur-md
+            "
+          >
+            {[
+              { value: "products", label: "🛍 Маҳсулотлар" },
+              { value: "categories", label: "📂 Категориялар" },
+              { value: "brands", label: "🏷️ Брендлар" },
+              { value: "orders", label: "📦 Буюртмалар" },
+              { value: "users", label: "👥 Фойдаланувчилар" },
+            ].map((tab) => (
+              <TabsTrigger
+                key={tab.value}
+                value={tab.value}
+                className="
+                  px-3 md:px-5 py-2 md:py-2.5 text-sm md:text-base font-medium
+                  rounded-xl transition-all duration-200
+                  text-gray-300 hover:text-[#d4af37] hover:bg-[#2a2a2a]
+                  data-[state=active]:bg-[#d4af37]
+                  data-[state=active]:text-black
+                  data-[state=active]:shadow-[0_0_10px_rgba(212,175,55,0.5)]
+                "
+              >
+                {tab.label}
+              </TabsTrigger>
+            ))}
           </TabsList>
+        </div>
 
-          <TabsContent value="products">
+        {/* ==== CONTENT WRAPPER ==== */}
+        <div
+          className="
+            bg-[#1a1a1a]/90 border border-[#2a2a2a]
+            rounded-2xl shadow-[0_0_15px_rgba(212,175,55,0.15)]
+            p-4 md:p-6
+            backdrop-blur-md
+          "
+        >
+          <TabsContent value="products" className="mt-4">
             <ProductsManager />
           </TabsContent>
 
-          <TabsContent value="categories">
+          <TabsContent value="categories" className="mt-4">
             <CategoriesManager />
           </TabsContent>
 
-          <TabsContent value="brands">
+          <TabsContent value="brands" className="mt-4">
             <BrandsManager />
           </TabsContent>
 
-          <TabsContent value="orders">
+          <TabsContent value="orders" className="mt-4">
             <OrdersManager />
           </TabsContent>
 
-          <TabsContent value="users">
+          <TabsContent value="users" className="mt-4">
             <UsersManager />
           </TabsContent>
+        </div>
+      </Tabs>
+    </div>
+  </Layout>
+);
 
-        </Tabs>
-      </div>
-    </Layout>
-  );
+
 };
 
 export default Admin;

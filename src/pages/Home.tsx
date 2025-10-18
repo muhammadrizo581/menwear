@@ -52,30 +52,32 @@ const Home = () => {
     window.dispatchEvent(new Event("cartUpdated"));
   }, [cart]);
 
-  const fetchProducts = async () => {
-    try {
-      let query = supabase
-        .from("products")
-        .select(`
-          *,
-          brands(name),
-          categories(name)
-        `)
-        .eq("in_stock", true);
+const fetchProducts = async () => {
+  try {
+    let query = supabase
+      .from("products")
+      .select(`
+        *,
+        brands(name),
+        categories(name)
+      `)
+      .eq("in_stock", true)
+      .order("created_at", { ascending: false }); // 🔥 Yangilari birinchi chiqadi
 
-      if (brandId) query = query.eq("brand_id", brandId);
-      if (categoryId) query = query.eq("category_id", categoryId);
+    if (brandId) query = query.eq("brand_id", brandId);
+    if (categoryId) query = query.eq("category_id", categoryId);
 
-      const { data, error } = await query;
-      if (error) throw error;
-      setProducts(data || []);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      toast.error("Маҳсулотларни юклашда хато");
-    } finally {
-      setLoading(false);
-    }
-  };
+    const { data, error } = await query;
+    if (error) throw error;
+    setProducts(data || []);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    toast.error("Маҳсулотларни юклашда хато");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const addToCart = (product: Product) => {
     const existing = cart.find((item) => item.id === product.id);
