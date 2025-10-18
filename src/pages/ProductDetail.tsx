@@ -113,26 +113,30 @@ const ProductDetail = () => {
             </div>
 
             {product.images?.length > 1 && (
-              <div className="flex gap-3 mt-5 flex-wrap justify-center">
-                {product.images.map((img, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setSelectedImage(img)}
-                    className={`border-2 rounded-xl overflow-hidden transition-all duration-200 ${
-                      selectedImage === img
-                        ? "border-[#d4af37] scale-105 shadow-lg"
-                        : "border-[#2a2a2a] hover:border-[#d4af37]/70"
-                    }`}
-                  >
-                    <img
-                      src={img}
-                      alt={`preview-${i}`}
-                      className="w-20 h-20 object-cover"
-                    />
-                  </button>
-                ))}
+              <div className="mt-5 w-full max-w-md overflow-x-auto scrollbar-hide">
+                <div className="flex gap-3 w-max px-1">
+                  {product.images.map((img, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setSelectedImage(img)}
+                      className={`border-2 rounded-xl overflow-hidden flex-shrink-0 transition-all duration-200 ${
+                        selectedImage === img
+                          ? "border-[#d4af37] scale-105 shadow-lg"
+                          : "border-[#2a2a2a] hover:border-[#d4af37]/70"
+                      }`}
+                    >
+                      <img
+                        src={img}
+                        alt={`preview-${i}`}
+                        className="w-20 h-20 object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
+
+
           </div>
 
           {/* RIGHT — PRODUCT DETAILS */}

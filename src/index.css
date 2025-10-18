@@ -9,6 +9,16 @@ body{
 All colors MUST be HSL.
 */
 
+/* 🔒 Scrollbar’ni yashirish uchun */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE va Edge uchun */
+  scrollbar-width: none; /* Firefox uchun */
+}
+
+
 @layer base {
   :root {
     --background: 0 0% 100%;

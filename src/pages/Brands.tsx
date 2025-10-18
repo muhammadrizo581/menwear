@@ -91,7 +91,7 @@ const Brands = () => {
             <p className="text-zinc-400 text-lg">Брендлар топилмади</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2">
             {brands.map((brand, index) => (
               <motion.div
                 key={brand.id}
@@ -101,10 +101,10 @@ const Brands = () => {
               >
                 <Card
                   onClick={() => navigate(`/?brand=${brand.id}`)}
-                  className="bg-[#111] border border-zinc-800 hover:border-[#c7a45a] transition-all rounded-2xl cursor-pointer group"
+                  className="bg-[#111] border border-zinc-800 hover:border-[#c7a45a] transition-all rounded-2xl cursor-pointer group h-20"
                 >
-                  <CardContent className="p-4 flex justify-center items-center">
-                    <h3 className="text-lg font-semibold text-white group-hover:text-[#c7a45a] transition-colors text-[12px]">
+                  <CardContent className="p-0 h-full flex justify-center items-center">
+                    <h3 className="text-base font-semibold text-white group-hover:text-[#c7a45a] transition-colors">
                       {brand.name}
                     </h3>
                   </CardContent>

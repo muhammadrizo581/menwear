@@ -7,6 +7,7 @@ import { ProductsManager } from "@/components/admin/ProductsManager";
 import { CategoriesManager } from "@/components/admin/CategoriesManager";
 import { BrandsManager } from "@/components/admin/BrandsManager";
 import { OrdersManager } from "@/components/admin/OrdersManager";
+import { UsersManager } from "@/components/admin/UsersManager";
 import { toast } from "sonner";
 
 const Admin = () => {
@@ -90,11 +91,12 @@ const Admin = () => {
         <h1 className="text-4xl font-bold mb-8 text-center">Админ панели</h1>
 
         <Tabs defaultValue="products" className="w-full">
-          <TabsList className="grid grid-cols-4 w-full bg-muted/5 rounded-lg p-1 mb-8 text-white">
+          <TabsList className="grid grid-cols-5 w-full bg-muted/5 rounded-lg p-1 mb-8 text-white">
             <TabsTrigger value="products">🛍 Маҳсулотлар</TabsTrigger>
             <TabsTrigger value="categories">📂 Категориялар</TabsTrigger>
             <TabsTrigger value="brands">🏷️ Брендлар</TabsTrigger>
             <TabsTrigger value="orders">📦 Буюртмалар</TabsTrigger>
+            <TabsTrigger value="users">Фойдаланувчилар</TabsTrigger>
           </TabsList>
 
           <TabsContent value="products">
@@ -112,6 +114,11 @@ const Admin = () => {
           <TabsContent value="orders">
             <OrdersManager />
           </TabsContent>
+
+          <TabsContent value="users">
+            <UsersManager />
+          </TabsContent>
+
         </Tabs>
       </div>
     </Layout>

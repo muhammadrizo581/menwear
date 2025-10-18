@@ -119,7 +119,6 @@ const Home = () => {
     { name: "Бош сахифа", path: "/" },
     { name: "Категориялар", path: "/categories" },
     { name: "Брендлар", path: "/brands" },
-    { name: "Сават", path: "/cart" },
     { name: "Профил", path: "/profile" },
   ];
 
@@ -136,6 +135,8 @@ const Home = () => {
         </button>
       </div>
 
+      
+      
       {/* Slide-out mobile menu (in-page) */}
       <AnimatePresence>
         {menuOpen && (
@@ -193,49 +194,25 @@ const Home = () => {
         )}
       </AnimatePresence>
 
+      
+
+      
       {/* PAGE CONTENT */}
       <div className="min-h-screen bg-[#0c0c0c] text-white">
         <div className="w-full mx-auto px-0 py-10 lg:container">
-          {/* HERO */}
-          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#111] via-[#2a2a2a] to-[#0c0c0c] p-12 mb-16 border border-[#2a2a2a] shadow-[0_0_25px_rgba(212,175,55,0.15)]">
-            <div className="relative z-10">
-              {/* Desktop logo + title (hidden on small screens) */}
-              <div className="flex gap-3">
-                <div className="hidden md:flex items-center gap-3 mb-4">
-                <img src="/logo.jpeg" alt="Menwear Logo" className="h-16" />
-              </div>
 
-              <h1 className="text-[24px] sm:text-5xl md:text-6xl font-extrabold text-[#d4af37] mb-4 tracking-tight">
-                  MENWEAR.UZ
-              </h1>
-              </div>
 
-              <p className="text-sm sm:text-base md:text-xl text-gray-300 mb-6 sm:mb-8 max-w-xl leading-relaxed">
-                Хитойдан сифатли эркаклар кийимлари — ҳар бир нарсада шукўҳ ва услуб.
-              </p>
-
-              <Button
-                size="lg"
-                className="text-sm sm:text-base md:text-lg bg-[#d4af37] text-black hover:bg-[#b8972f] font-semibold rounded-full px-6 sm:px-8 py-4 sm:py-6 shadow-lg transition-all"
-                onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
-              >
-                Маҳсулотларни кўриш
-              </Button>
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-br from-transparent to-[#d4af3710]" />
-          </div>
-
-          {/* Search */}
+          {/* SEARCH */}       
           <div className="mb-10 flex justify-center">
             <div className="relative w-full max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <Input placeholder="Маҳсулот қидириш..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10 bg-[#1a1a1a] border-[#2a2a2a] text-white placeholder-gray-500 focus:border-[#d4af37] focus:ring-[#d4af37]" />
             </div>
           </div>
-
+          
+          
           {/* Products grid */}
           <div id="products">
-            <h2 className="text-3xl font-bold text-[#d4af37] mb-8 text-center">Маҳсулотлар</h2>
 
             {loading ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -258,7 +235,7 @@ const Home = () => {
                   return (
                     <Card key={product.id} className="group bg-[#1a1a1a] border-[#2a2a2a] hover:border-[#d4af37] hover:shadow-[0_0_20px_rgba(212,175,55,0.2)] transition-all duration-300 cursor-pointer" onClick={() => navigate(`/product/${product.id}`)}>
                       <div className="relative overflow-hidden rounded-t-lg">
-                        <img src={product.images[0] || "/placeholder.svg"} alt={product.name} className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500" />
+                        <img src={product.images[0] || "/placeholder.svg"} alt={product.name} className="w-full h-64 object-cover transition-transform duration-500" />
                         {product.brands && <Badge className="absolute top-3 right-3 bg-[#d4af37] text-black font-semibold shadow-md">{product.brands.name}</Badge>}
                       </div>
 

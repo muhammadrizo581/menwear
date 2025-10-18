@@ -90,47 +90,50 @@ export const ProductsManager = () => {
   };
 
   // === FORM SUBMIT ===
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    let uploadedUrls: string[] = formData.images || [];
-    if (files && files.length > 0) {
-      const urls = await handleUpload();
-      uploadedUrls = [...uploadedUrls, ...urls];
-    }
+  let uploadedUrls: string[] = formData.images || [];
 
-    const productData = {
-      name: formData.name,
-      description: formData.description,
-      price: parseFloat(formData.price),
-      category_id: formData.category_id || null,
-      brand_id: formData.brand_id || null,
-      images: uploadedUrls,
-      sizes: formData.sizes ? formData.sizes.split(",").map((s) => s.trim()) : [],
-      in_stock: formData.in_stock,
-    };
+  // agar yangi fayllar tanlangan bo‘lsa, yuklab, eski rasmlarga qo‘shamiz
+  if (files && files.length > 0) {
+    const urls = await handleUpload();
+    uploadedUrls = [...uploadedUrls, ...urls];
+  }
 
-    if (editing) {
-      const { error } = await supabase
-        .from("products")
-        .update(productData)
-        .eq("id", editing.id);
-      if (error) toast.error("Хатолик юз берди");
-      else {
-        toast.success("Маҳсулот янгиланди ✏️");
-        resetForm();
-        loadData();
-      }
-    } else {
-      const { error } = await supabase.from("products").insert(productData);
-      if (error) toast.error("Хатолик юз берди");
-      else {
-        toast.success("Маҳсулот қўшилди ✅");
-        resetForm();
-        loadData();
-      }
-    }
+  const productData = {
+    name: formData.name,
+    description: formData.description,
+    price: parseFloat(formData.price),
+    category_id: formData.category_id || null,
+    brand_id: formData.brand_id || null,
+    images: uploadedUrls, // 👈 eski + yangi rasmlar
+    sizes: formData.sizes ? formData.sizes.split(",").map((s) => s.trim()) : [],
+    in_stock: formData.in_stock,
   };
+
+  if (editing) {
+    const { error } = await supabase
+      .from("products")
+      .update(productData)
+      .eq("id", editing.id);
+    if (error) toast.error("Хатолик юз берди");
+    else {
+      toast.success("Маҳсулот янгиланди ✏️");
+      resetForm();
+      loadData();
+    }
+  } else {
+    const { error } = await supabase.from("products").insert(productData);
+    if (error) toast.error("Хатолик юз берди");
+    else {
+      toast.success("Маҳсулот қўшилди ✅");
+      resetForm();
+      loadData();
+    }
+  }
+};
+
 
   // === RASM O‘CHIRISH ===
   const handleRemoveImage = (url: string) => {
