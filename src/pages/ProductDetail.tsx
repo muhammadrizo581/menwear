@@ -28,7 +28,12 @@ const ProductDetail = () => {
     const loadProduct = async () => {
       const { data, error } = await supabase
         .from("products")
-        .select("*, categories(name), brands(name)")
+        .select(`
+          *,
+          categories(name),
+          brands(name),
+          product_images(image_base64)
+        `)
         .eq("id", id)
         .single();
 
@@ -36,8 +41,11 @@ const ProductDetail = () => {
         console.error(error);
         toast.error("Маълумотни юклашда хатолик");
       } else {
-        setProduct(data);
-        setSelectedImage(data.images?.[0] || null);
+        const images =
+          data?.product_images?.map((img: any) => img.image_base64) || [];
+        const productData = { ...data, images };
+        setProduct(productData);
+        setSelectedImage(images[0] || null);
 
         const cart = JSON.parse(localStorage.getItem("cart") || "[]");
         const existing = cart.find((item: any) => item.id === data.id);
@@ -106,7 +114,7 @@ const ProductDetail = () => {
           <div className="flex flex-col items-center">
             <div className="w-full max-w-md aspect-[4/5] bg-[#111] border border-[#2a2a2a] rounded-2xl overflow-hidden shadow-xl">
               <img
-                src={selectedImage || product.images?.[0]}
+                src={selectedImage || product.images?.[0] || "/placeholder.svg"}
                 alt={product.name}
                 className="w-full h-full object-contain bg-[#0b0b0b] transition-transform duration-300 hover:scale-105"
               />
@@ -135,14 +143,12 @@ const ProductDetail = () => {
                 </div>
               </div>
             )}
-
-
           </div>
 
           {/* RIGHT — PRODUCT DETAILS */}
           <Card className="bg-[#1a1a1a] border border-[#2a2a2a] text-white shadow-2xl h-[500px] rounded-2xl">
-            <CardContent className="p-8 space-y-6 flex flex-col justify-center h-full" >
-              <div >
+            <CardContent className="p-8 space-y-6 flex flex-col justify-center h-full">
+              <div>
                 <h1 className="text-[50px] font-bold text-[#d4af37] tracking-tight">
                   {product.name}
                 </h1>
@@ -168,7 +174,7 @@ const ProductDetail = () => {
                     {product.sizes.map((s) => (
                       <span
                         key={s}
-                        className="uppercase  px-3 py-1 border border-[#d4af37] rounded-full text-sm text-gray-200"
+                        className="uppercase px-3 py-1 border border-[#d4af37] rounded-full text-sm text-gray-200"
                       >
                         {s}
                       </span>
@@ -184,7 +190,7 @@ const ProductDetail = () => {
                     <Button
                       onClick={decreaseQty}
                       variant="outline"
-                      className="w-12 h-12 text-2xl font-bold text-white bg-[[#2a2a2a] border-[#2a2a2a] rounded-full"
+                      className="w-12 h-12 text-2xl font-bold text-white bg-[#2a2a2a] border-[#2a2a2a] rounded-full"
                     >
                       –
                     </Button>
@@ -194,7 +200,7 @@ const ProductDetail = () => {
                     <Button
                       onClick={increaseQty}
                       variant="outline"
-                      className="w-12 h-12 text-2xl font-bold text-white bg-[[#2a2a2a] border-[#2a2a2a] rounded-full"
+                      className="w-12 h-12 text-2xl font-bold text-white bg-[#2a2a2a] border-[#2a2a2a] rounded-full"
                     >
                       +
                     </Button>
@@ -202,7 +208,7 @@ const ProductDetail = () => {
                 ) : (
                   <Button
                     onClick={addToCart}
-                    className="translate-y-[-20px]  w-full bg-[#d4af37] text-black hover:bg-[#b8972f] font-semibold text-lg py-6 rounded-xl transition-all duration-300"
+                    className="translate-y-[-20px] w-full bg-[#d4af37] text-black hover:bg-[#b8972f] font-semibold text-lg py-6 rounded-xl transition-all duration-300"
                   >
                     🛒 Саватга қўшиш
                   </Button>
