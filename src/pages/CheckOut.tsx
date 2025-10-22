@@ -73,21 +73,20 @@ const Checkout = () => {
         return;
       }
 
-      const botToken = "8224819334:AAGOK1ZCQEivT_RDtMXAiGfGDb0k05tgnzI";
-      const chatId = "-1003144620511";
+      const botToken = import.meta.env.VITE_TELEGRAM_BOT_TOKEN;
+      const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID;
 
       const message = `
         🛍️ <b>Yangi buyurtma</b>
-        👤 <b>Ism:</b> ${form.customer_name}
-        📞 <b>Telefon:</b> ${form.customer_phone}
-        📨 <b>Telegram:</b> ${form.customer_address}
+        
+👤 <b>Ism:</b> ${form.customer_name}
+📞 <b>Telefon:</b> ${form.customer_phone}
+📨 <b>Telegram:</b> ${form.customer_address}
 
-        🧾 <b>Mahsulotlar:</b>
-        ${cart.map((i) => `• ${i.name} x${i.quantity} — $${i.price}`).join("\n")}
+🧾 <b>Mahsulotlar:</b>
+${cart.map((i) => `• ${i.name} x${i.quantity} — $${i.price}`).join("\n")}
 
-        💰 <b>Jami:</b> $${total.toFixed(2)}
-
-        ${userData ? `📧 Email: ${userData.email}` : ""}
+💰 <b>Jami:</b> $${total.toFixed(2)}
       `;
 
       await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {

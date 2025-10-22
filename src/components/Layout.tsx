@@ -51,7 +51,7 @@ const Layout = ({ children }: LayoutProps) => {
         alt="Menwear Logo"
         className="h-8 w-auto rounded-full"
       />
-      <span className="hidden md:block text-[#d4af37] font-bold">MENWEAR.UZ</span>
+      <span className="hidden md:block text-[#d4af37] font-bold">MENWEAR</span>
     </Link>
 
           {/* DESKTOP LOGO (faqat md va undan katta ekranlarda chiqadi) */}

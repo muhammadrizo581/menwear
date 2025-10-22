@@ -26,34 +26,38 @@ const ProductDetail = () => {
 
   useEffect(() => {
     const loadProduct = async () => {
-      const { data, error } = await supabase
-        .from("products")
-        .select(`
-          *,
-          categories(name),
-          brands(name),
-          product_images(image_base64)
-        `)
-        .eq("id", id)
-        .single();
+  const { data, error } = await supabase
+    .from("products")
+    .select(`
+      *,
+      categories(name),
+      brands(name),
+      product_images(image_base64)
+    `)
+    .eq("id", id)
+    .single();
 
-      if (error) {
-        console.error(error);
-        toast.error("Маълумотни юклашда хатолик");
-      } else {
-        const images =
-          data?.product_images?.map((img: any) => img.image_base64) || [];
-        const productData = { ...data, images };
-        setProduct(productData);
-        setSelectedImage(images[0] || null);
+  if (error) {
+    console.error(error);
+    toast.error("Маълумотни юклашда хатолик");
+    setLoading(false);
+    return;
+  }
 
-        const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-        const existing = cart.find((item: any) => item.id === data.id);
-        setCartQty(existing ? existing.quantity : 0);
-      }
+  const productData = data as any; // ✅ TS xatosini yo‘qotadi
+  const images =
+    productData?.product_images?.map((img: any) => img.image_base64) || [];
 
-      setLoading(false);
-    };
+  setProduct({ ...productData, images });
+  setSelectedImage(images[0] || null);
+
+  const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+  const existing = cart.find((item: any) => item.id === productData.id);
+  setCartQty(existing ? existing.quantity : 0);
+
+  setLoading(false);
+};
+
 
     loadProduct();
   }, [id]);

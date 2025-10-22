@@ -59,16 +59,24 @@ const Auth = () => {
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-otp`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ phone, telegram_username: telegramUsername }),
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            phone,
+            telegram_username: telegramUsername,
+          }),
         }
       );
+
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "OTP юборишда хато");
 
-      toast.success("OTP код Telegram орқали юборилди!");
+      toast.success("OTP код Telegram орқали юборилди ✅");
       setOtpSent(true);
     } catch (error: any) {
+      console.error("OTP Error:", error);
       toast.error(error.message || "Хатолик юз берди");
     } finally {
       setLoading(false);
@@ -93,7 +101,10 @@ const Auth = () => {
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-otp`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
           body: JSON.stringify({
             phone,
             code: otpCode,
@@ -112,6 +123,7 @@ const Auth = () => {
       await supabase.auth.signInWithPassword({ email, password });
       navigate("/");
     } catch (error: any) {
+      console.error("Verify Error:", error);
       toast.error(error.message || "Хатолик юз берди");
     } finally {
       setLoading(false);
@@ -161,15 +173,12 @@ const Auth = () => {
                 </TabsTrigger>
               </TabsList>
 
-              {/* LOGIN FORM */}
+              {/* LOGIN */}
               <TabsContent value="login">
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div>
-                    <Label htmlFor="login-email" className="text-gray-300">
-                      Email
-                    </Label>
+                    <Label className="text-gray-300">Email</Label>
                     <Input
-                      id="login-email"
                       type="email"
                       placeholder="info@example.com"
                       className="bg-zinc-800 border-zinc-700 text-gray-100"
@@ -180,11 +189,8 @@ const Auth = () => {
                   </div>
 
                   <div>
-                    <Label htmlFor="login-password" className="text-gray-300">
-                      Парол
-                    </Label>
+                    <Label className="text-gray-300">Парол</Label>
                     <Input
-                      id="login-password"
                       type="password"
                       className="bg-zinc-800 border-zinc-700 text-gray-100"
                       value={password}
@@ -203,16 +209,13 @@ const Auth = () => {
                 </form>
               </TabsContent>
 
-              {/* SIGNUP FORM */}
+              {/* SIGNUP */}
               <TabsContent value="signup">
                 {!otpSent ? (
                   <form onSubmit={handleSendOTP} className="space-y-4">
                     <div>
-                      <Label htmlFor="signup-phone" className="text-gray-300">
-                        Телефон рақам
-                      </Label>
+                      <Label className="text-gray-300">Телефон рақам</Label>
                       <Input
-                        id="signup-phone"
                         type="tel"
                         placeholder="+998901234567"
                         className="bg-zinc-800 border-zinc-700 text-gray-100"
@@ -222,11 +225,8 @@ const Auth = () => {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="signup-telegram" className="text-gray-300">
-                        Telegram (@username)
-                      </Label>
+                      <Label className="text-gray-300">Telegram (@username)</Label>
                       <Input
-                        id="signup-telegram"
                         type="text"
                         placeholder="@username"
                         className="bg-zinc-800 border-zinc-700 text-gray-100"
@@ -249,11 +249,8 @@ const Auth = () => {
                 ) : (
                   <form onSubmit={handleVerifyOTP} className="space-y-4">
                     <div>
-                      <Label htmlFor="signup-name" className="text-gray-300">
-                        Тўлиқ исм
-                      </Label>
+                      <Label className="text-gray-300">Тўлиқ исм</Label>
                       <Input
-                        id="signup-name"
                         type="text"
                         placeholder="Исмингиз"
                         className="bg-zinc-800 border-zinc-700 text-gray-100"
@@ -264,11 +261,8 @@ const Auth = () => {
                     </div>
 
                     <div>
-                      <Label htmlFor="signup-email" className="text-gray-300">
-                        Email
-                      </Label>
+                      <Label className="text-gray-300">Email</Label>
                       <Input
-                        id="signup-email"
                         type="email"
                         placeholder="info@example.com"
                         className="bg-zinc-800 border-zinc-700 text-gray-100"
@@ -279,11 +273,8 @@ const Auth = () => {
                     </div>
 
                     <div>
-                      <Label htmlFor="signup-password" className="text-gray-300">
-                        Парол
-                      </Label>
+                      <Label className="text-gray-300">Парол</Label>
                       <Input
-                        id="signup-password"
                         type="password"
                         className="bg-zinc-800 border-zinc-700 text-gray-100"
                         value={password}
