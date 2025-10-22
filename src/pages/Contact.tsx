@@ -63,7 +63,7 @@ const Contact = () => {
                     rel="noopener noreferrer"
                     className="text-[#c7a45a] hover:underline text-sm"
                   >
-                    @menwearuz_bot
+                    @manwear_uz
                   </a>
                 </div>
               </div>

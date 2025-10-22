@@ -141,7 +141,6 @@ const Home = () => {
 
   return (
     <Layout>
-      {/* MOBILE HAMBURGER */}
       <div className="md:hidden fixed top-4 left-4 z-50 mt-[-10px]">
         <button
           onClick={() => setMenuOpen(true)}
@@ -152,7 +151,7 @@ const Home = () => {
         </button>
       </div>
 
-      {/* MOBILE MENU */}
+      
       <AnimatePresence>
         {menuOpen && (
           <>
@@ -235,42 +234,51 @@ const Home = () => {
           {/* PRODUCTS GRID */}
           <div id="products">
             {loading ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {[...Array(8)].map((_, i) => (
-                  <Card
-                    key={i}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] animate-pulse"
-                  >
-                    <div className="h-64 bg-[#2a2a2a] rounded-t-lg" />
-                    <CardContent className="p-4">
-                      <div className="h-4 bg-[#2a2a2a] rounded mb-2" />
-                      <div className="h-3 bg-[#2a2a2a] rounded w-2/3" />
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            ) : filteredProducts.length === 0 ? (
-              <div className="text-center py-20 text-gray-400 text-lg">
-                Маҳсулотлар топилмади 😔
-              </div>
-            ) : (
+  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+    {[...Array(Math.min(filteredProducts.length || 8, 8))].map((_, i) => (
+      <Card
+        key={i}
+        className="group bg-[#1a1a1a] border-[#2a2a2a] rounded-xl overflow-hidden"
+      >
+        {/* Skeleton Image */}
+        <div className="relative aspect-square w-full bg-[#151515] overflow-hidden">
+          <div className="absolute inset-0 bg-[#2a2a2a] animate-pulse" />
+        </div>
+
+        <CardContent className="p-5">
+          <div className="h-5 bg-[#2a2a2a] rounded w-3/4 mb-3 animate-pulse" />
+          <div className="h-4 bg-[#2a2a2a] rounded w-1/2 animate-pulse" />
+        </CardContent>
+
+        <CardFooter className="p-2 pt-0">
+          <div className="h-[50px] w-full bg-[#2a2a2a] rounded-xl animate-pulse" />
+        </CardFooter>
+      </Card>
+    ))}
+  </div>
+) : filteredProducts.length === 0 ? (
+  <div className="text-center py-20 text-gray-400 text-lg">
+    Маҳсулотлар топилмади 😔
+  </div>
+) : (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                 {filteredProducts.map((product) => {
                   const quantity = getQuantity(product.id);
                   const firstImage =
-                    product.product_images?.[0]?.image_base64 ||
-                    "/placeholder.svg";
+                    product.product_images?.[0]?.image_base64 || "/placeholder.svg";
+
                   return (
                     <Card
                       key={product.id}
-                      className="group bg-[#1a1a1a] border-[#2a2a2a] hover:border-[#d4af37] hover:shadow-[0_0_20px_rgba(212,175,55,0.2)] transition-all duration-300 cursor-pointer"
+                      className="group bg-[#1a1a1a] border-[#2a2a2a] hover:border-[#d4af37] hover:shadow-[0_0_20px_rgba(212,175,55,0.2)] transition-all duration-300 cursor-pointer overflow-hidden"
                       onClick={() => navigate(`/product/${product.id}`)}
                     >
-                      <div className="relative overflow-hidden rounded-t-lg">
+                      {/* Rasm joyi */}
+                      <div className="relative aspect-square w-full overflow-hidden bg-[#111]">
                         <img
                           src={firstImage}
                           alt={product.name}
-                          className="w-full h-64 object-cover"
+                          className="w-full h-full object-cover transition-transform duration-500 "
                         />
                         {product.brands && (
                           <Badge className="absolute top-3 right-3 bg-[#d4af37] text-black font-semibold shadow-md">
@@ -283,9 +291,7 @@ const Home = () => {
                         <h3 className="font-semibold text-lg text-white mb-2 line-clamp-2">
                           {product.name}
                         </h3>
-                        <p className="text-2xl font-bold text-[#d4af37]">
-                          ${product.price}
-                        </p>
+                        <p className="text-2xl font-bold text-[#d4af37]">${product.price}</p>
                       </CardContent>
 
                       <CardFooter className="p-2 pt-0">
@@ -300,9 +306,7 @@ const Home = () => {
                             >
                               –
                             </button>
-                            <span className="text-lg font-semibold">
-                              {quantity}
-                            </span>
+                            <span className="text-lg font-semibold">{quantity}</span>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();

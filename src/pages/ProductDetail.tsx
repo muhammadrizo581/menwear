@@ -26,38 +26,37 @@ const ProductDetail = () => {
 
   useEffect(() => {
     const loadProduct = async () => {
-  const { data, error } = await supabase
-    .from("products")
-    .select(`
-      *,
-      categories(name),
-      brands(name),
-      product_images(image_base64)
-    `)
-    .eq("id", id)
-    .single();
+      const { data, error } = await supabase
+        .from("products")
+        .select(`
+          *,
+          categories(name),
+          brands(name),
+          product_images(image_base64)
+        `)
+        .eq("id", id)
+        .single();
 
-  if (error) {
-    console.error(error);
-    toast.error("Маълумотни юклашда хатолик");
-    setLoading(false);
-    return;
-  }
+      if (error) {
+        console.error(error);
+        toast.error("Маълумотни юклашда хатолик");
+        setLoading(false);
+        return;
+      }
 
-  const productData = data as any; // ✅ TS xatosini yo‘qotadi
-  const images =
-    productData?.product_images?.map((img: any) => img.image_base64) || [];
+      const productData = data as any;
+      const images =
+        productData?.product_images?.map((img: any) => img.image_base64) || [];
 
-  setProduct({ ...productData, images });
-  setSelectedImage(images[0] || null);
+      setProduct({ ...productData, images });
+      setSelectedImage(images[0] || null);
 
-  const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-  const existing = cart.find((item: any) => item.id === productData.id);
-  setCartQty(existing ? existing.quantity : 0);
+      const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+      const existing = cart.find((item: any) => item.id === productData.id);
+      setCartQty(existing ? existing.quantity : 0);
 
-  setLoading(false);
-};
-
+      setLoading(false);
+    };
 
     loadProduct();
   }, [id]);
@@ -112,20 +111,21 @@ const ProductDetail = () => {
 
   return (
     <Layout>
-      <div className="container py-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          {/* LEFT — PRODUCT IMAGES */}
+      <div className="container py-10 md:py-14 lg:py-20">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+          {/* === LEFT — IMAGES === */}
           <div className="flex flex-col items-center">
-            <div className="w-full max-w-md aspect-[4/5] bg-[#111] border border-[#2a2a2a] rounded-2xl overflow-hidden shadow-xl">
+            <div className="w-full max-w-lg aspect-square bg-[#111] border border-[#2a2a2a] rounded-2xl overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.5)] relative">
               <img
                 src={selectedImage || product.images?.[0] || "/placeholder.svg"}
                 alt={product.name}
-                className="w-full h-full object-contain bg-[#0b0b0b] transition-transform duration-300 hover:scale-105"
+                className="absolute inset-0 w-full h-full object-cover transition-all duration-300 "
               />
             </div>
 
+            {/* Thumbnail images */}
             {product.images?.length > 1 && (
-              <div className="mt-5 w-full max-w-md overflow-x-auto scrollbar-hide">
+              <div className="mt-5 w-full max-w-lg overflow-x-auto scrollbar-hide">
                 <div className="flex gap-3 w-max px-1">
                   {product.images.map((img, i) => (
                     <button
@@ -140,7 +140,7 @@ const ProductDetail = () => {
                       <img
                         src={img}
                         alt={`preview-${i}`}
-                        className="w-20 h-20 object-cover"
+                        className="w-20 h-20 sm:w-24 sm:h-24 object-cover"
                       />
                     </button>
                   ))}
@@ -149,32 +149,37 @@ const ProductDetail = () => {
             )}
           </div>
 
-          {/* RIGHT — PRODUCT DETAILS */}
-          <Card className="bg-[#1a1a1a] border border-[#2a2a2a] text-white shadow-2xl h-[500px] rounded-2xl">
-            <CardContent className="p-8 space-y-6 flex flex-col justify-center h-full">
+
+          {/* === RIGHT — DETAILS === */}
+          <Card className="bg-[#1a1a1a] border border-[#2a2a2a] text-white shadow-2xl rounded-2xl h-auto">
+            <CardContent className="p-6 sm:p-8 space-y-5 flex flex-col justify-center">
+              {/* Product Name + Brand */}
               <div>
-                <h1 className="text-[50px] font-bold text-[#d4af37] tracking-tight">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#d4af37] tracking-tight leading-tight">
                   {product.name}
                 </h1>
-                <p className="text-[16px] text-gray-500 mt-1">
+                <p className="text-gray-500 mt-1 text-sm sm:text-base">
                   {product.brands?.name} — {product.categories?.name}
                 </p>
               </div>
 
-              <p className="text-gray-400 leading-relaxed text-[20px]">
+              {/* Description */}
+              <p className="text-gray-400 leading-relaxed text-base sm:text-lg">
                 {product.description}
               </p>
 
-              <div className="text-3xl font-bold text-[#d4af37]">
+              {/* Price */}
+              <div className="text-3xl sm:text-4xl font-bold text-[#d4af37] pt-2">
                 ${product.price}
               </div>
 
+              {/* Sizes */}
               {product.sizes?.length > 0 && (
-                <div>
-                  <h3 className="text-[#d4af37] font-semibold mb-2">
+                <div className="pt-2">
+                  <h3 className="text-[#d4af37] font-semibold mb-2 text-base sm:text-lg">
                     Ўлчамлар:
                   </h3>
-                  <div className="flex gap-2 flex-wrap mt-[20px]">
+                  <div className="flex gap-2 flex-wrap">
                     {product.sizes.map((s) => (
                       <span
                         key={s}
@@ -188,13 +193,13 @@ const ProductDetail = () => {
               )}
 
               {/* CART ACTIONS */}
-              <div className="pt-6">
+              <div className="pt-4">
                 {cartQty > 0 ? (
                   <div className="flex items-center justify-center gap-6">
                     <Button
                       onClick={decreaseQty}
                       variant="outline"
-                      className="w-12 h-12 text-2xl font-bold text-white bg-[#2a2a2a] border-[#2a2a2a] rounded-full"
+                      className="w-12 h-12 text-2xl font-bold text-white bg-[#2a2a2a] border-[#2a2a2a] rounded-full hover:bg-[#383838]"
                     >
                       –
                     </Button>
@@ -204,7 +209,7 @@ const ProductDetail = () => {
                     <Button
                       onClick={increaseQty}
                       variant="outline"
-                      className="w-12 h-12 text-2xl font-bold text-white bg-[#2a2a2a] border-[#2a2a2a] rounded-full"
+                      className="w-12 h-12 text-2xl font-bold text-white bg-[#2a2a2a] border-[#2a2a2a] rounded-full hover:bg-[#383838]"
                     >
                       +
                     </Button>
@@ -212,7 +217,7 @@ const ProductDetail = () => {
                 ) : (
                   <Button
                     onClick={addToCart}
-                    className="translate-y-[-20px] w-full bg-[#d4af37] text-black hover:bg-[#b8972f] font-semibold text-lg py-6 rounded-xl transition-all duration-300"
+                    className="mt-6 w-full bg-[#d4af37] text-black hover:bg-[#b8972f] font-semibold text-lg py-5 rounded-xl transition-all duration-300"
                   >
                     🛒 Саватга қўшиш
                   </Button>
