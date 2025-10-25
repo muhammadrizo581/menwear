@@ -77,15 +77,15 @@ const Categories = () => {
 
           {/* CATEGORIES GRID */}
           {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              {[...Array(6)].map((_, i) => (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[...Array(8)].map((_, i) => (
                 <Card
                   key={i}
-                  className="animate-pulse bg-[#1a1a1a] border-[#2a2a2a]"
+                  className="animate-pulse bg-[#1a1a1a]  border-[#2a2a2a]"
                 >
-                  <CardContent className="p-6">
+                  <CardContent className="p-14 ">
                     <div className="h-6 bg-[#2a2a2a] rounded"></div>
-                  </CardContent>
+                  </CardContent>                  
                 </Card>
               ))}
             </div>

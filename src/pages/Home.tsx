@@ -51,35 +51,53 @@ const Home = () => {
   }, [cart]);
 
   // 🔥 Fetch products with multiple images
-  const fetchProducts = async () => {
-    try {
-      let query = supabase
-        .from("products")
-        .select(`
-          *,
-          product_images(image_base64),
-          brands(name),
-          categories(name)
-        `)
-        .eq("in_stock", true)
-        .order("created_at", { ascending: false });
+// 🔥 Fetch products with multiple images
+const fetchProducts = async () => {
+  try {
+    setLoading(true);
 
-      if (brandId) query = query.eq("brand_id", brandId);
-      if (categoryId) query = query.eq("category_id", categoryId);
+    let query = supabase
+      .from("products")
+      .select(`
+        id,
+        name,
+        description,
+        price,
+        sizes,
+        in_stock,
+        brand_id,
+        category_id,
+        product_images(image_base64),
+        brands(name),
+        categories(name)
+      `)
+      .eq("in_stock", true)
+      .order("created_at", { ascending: false });
 
-      const { data, error } = await query;
-      if (error) throw error;
+    if (brandId) query = query.eq("brand_id", brandId);
+    if (categoryId) query = query.eq("category_id", categoryId);
 
-      console.log("Fetched products:", data);
+    const { data, error } = await query;
+    if (error) throw error;
 
-      setProducts(data as any || []);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      toast.error("Маҳсулотларни юклашда хато");
-    } finally {
-      setLoading(false);
-    }
-  };
+    // ✅ Rasm arrayini to‘g‘ri formatda o‘tkazish
+    const formatted = (data || []).map((p: any) => ({
+      ...p,
+      product_images: p.product_images?.map((img: any) => ({
+        image_base64: img.image_base64,
+      })) || [],
+    }));
+
+    console.log("✅ Fetched products:", formatted);
+    setProducts(formatted);
+  } catch (error) {
+    console.error("❌ Error fetching products:", error);
+    toast.error("Маҳсулотларни юклашда хато");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const addToCart = (product: Product) => {
     const existing = cart.find((item) => item.id === product.id);
