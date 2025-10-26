@@ -10,73 +10,50 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any>(null);
   const [orders, setOrders] = useState<any[]>([]);
-  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchProfile();
-  }, []);
+    const fetchAll = async () => {
+      try {
+        const {
+          data: { user },
+          error: userError,
+        } = await supabase.auth.getUser();
 
-  useEffect(() => {
-    if (userId) fetchOrders(userId);
-  }, [userId]);
+        if (userError) throw userError;
+        if (!user) {
+          navigate("/auth");
+          return;
+        }
 
-  const fetchProfile = async () => {
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        // 🧍 Profil ma’lumotlari
+        const { data: profileData, error: profileError } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .single();
 
-      if (!user) {
-        navigate("/auth");
-        return;
+        if (profileError) throw profileError;
+        setProfile(profileData);
+
+        // 📦 Buyurtmalar (endi JSON field “items” orqali)
+        const { data: orderData, error: orderError } = await supabase
+          .from("orders")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false });
+
+        if (orderError) throw orderError;
+        setOrders(orderData || []);
+      } catch (err: any) {
+        console.error("Error loading profile:", err);
+        toast.error("Маълумотларни юклашда хато: " + err.message);
+      } finally {
+        setLoading(false);
       }
+    };
 
-      setUserId(user.id);
-
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-
-      if (error) throw error;
-      setProfile(data);
-    } catch (error) {
-      console.error("Error fetching profile:", error);
-      toast.error("Профилни юклашда хато");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchOrders = async (id: string) => {
-    try {
-      const { data, error } = await supabase
-        .from("orders")
-        .select(`
-          id,
-          created_at,
-          order_items (
-            id,
-            quantity,
-            price,
-            products (
-              name,
-              images
-            )
-          )
-        `)
-        .eq("user_id", id)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      setOrders(data || []);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-      toast.error("Буюртмаларни юклашда хато: " + (error as any)?.message);
-
-    }
-  };
+    fetchAll();
+  }, [navigate]);
 
   if (loading) {
     return (
@@ -154,62 +131,57 @@ const Profile = () => {
               </div>
             ) : (
               <div className="space-y-6">
-                {orders.map((order) => (
-                  <Card
-                    key={order.id}
-                    className="bg-[#1a1a1a]/95 border border-[#2a2a2a] shadow-[0_0_15px_rgba(212,175,55,0.1)]"
-                  >
-                    <CardHeader className="pb-2 border-b border-[#2a2a2a]">
-                      <CardTitle className="text-[#d4af37] text-lg">
-                        📦 Буюртма #{order.id.slice(0, 8).toUpperCase()}
-                      </CardTitle>
-                      <p className="text-sm text-gray-400">
-                        {new Date(order.created_at).toLocaleString("uz-UZ")}
-                      </p>
-                    </CardHeader>
+                {orders.map((order) => {
+                  const items = order.items || [];
+                  return (
+                    <Card
+                      key={order.id}
+                      className="bg-[#1a1a1a]/95 border border-[#2a2a2a] shadow-[0_0_15px_rgba(212,175,55,0.1)]"
+                    >
+                      <CardHeader className="pb-2 border-b border-[#2a2a2a]">
+                        <CardTitle className="text-[#d4af37] text-lg">
+                          📦 Буюртма #{order.id.slice(0, 8).toUpperCase()}
+                        </CardTitle>
+                        <p className="text-sm text-gray-400">
+                          {new Date(order.created_at).toLocaleString("uz-UZ")}
+                        </p>
+                      </CardHeader>
 
-                    <CardContent className="pt-4 space-y-3">
-                      {(order.order_items || []).map((item: any) => (
-                        <div
-                          key={item.id}
-                          className="flex items-center gap-4 border-b border-[#2a2a2a] pb-3"
-                        >
-                          <img
-                            src={
-                              item.products?.images?.[0]?.startsWith("http")
-                                ? item.products.images[0]
-                                : "/placeholder.svg"
-                            }
-                            alt={item.products?.name || "Mahsulot"}
-                            className="w-16 h-16 rounded object-cover border border-[#333]"
-                          />
-                          <div className="flex-1">
-                            <p className="text-white font-semibold">
-                              {item.products?.name || "—"}
-                            </p>
-                            <p className="text-sm text-gray-400">
-                              {item.quantity} × ${item.price}
-                            </p>
+                      <CardContent className="pt-4 space-y-3">
+                        {items.map((item: any, idx: number) => (
+                          <div
+                            key={idx}
+                            className="flex items-center gap-4 border-b border-[#2a2a2a] pb-3"
+                          >
+                            <img
+                              src={
+                                item.image
+                                  ? item.image
+                                  : "/placeholder.svg"
+                              }
+                              alt={item.name || "Mahsulot"}
+                              className="w-16 h-16 rounded object-cover border border-[#333]"
+                            />
+
+                            <div className="flex-1">
+                              <p className="text-white font-semibold">
+                                {item.name || "—"}
+                              </p>
+                              <p className="text-sm text-gray-400">
+                                {item.quantity} × ${item.price}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
 
-                      <div className="flex justify-between text-[#d4af37] font-bold pt-2">
-                        <span>Жами:</span>
-                        <span>
-                          $
-                          {(order.order_items || [])
-                            .reduce(
-                              (acc: number, item: any) =>
-                                acc + (item.price || 0) * (item.quantity || 0),
-                              0
-                            )
-                            .toFixed(2)}
-                        </span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                        <div className="flex justify-between text-[#d4af37] font-bold pt-2">
+                          <span>Жами:</span>
+                          <span>${order.total_price?.toFixed(2)}</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
             )}
           </div>
