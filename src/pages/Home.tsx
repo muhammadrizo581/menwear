@@ -15,7 +15,7 @@ interface Product {
   name: string;
   description: string;
   price: number;
-  product_images: { image_base64: string }[];
+  product_images: { image_url: string }[];
   sizes: string[];
   in_stock: boolean;
   brand_id: string;
@@ -50,60 +50,63 @@ const Home = () => {
     window.dispatchEvent(new Event("cartUpdated"));
   }, [cart]);
 
-  // 🔥 Fetch products with multiple images
-// 🔥 Fetch products with multiple images
-const fetchProducts = async () => {
-  try {
-    setLoading(true);
+  // 🔥 Fetch products with ImageKit URLs
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
 
-    let query = supabase
-      .from("products")
-      .select(`
-        id,
-        name,
-        description,
-        price,
-        sizes,
-        in_stock,
-        brand_id,
-        category_id,
-        product_images(image_base64),
-        brands(name),
-        categories(name)
-      `)
-      .eq("in_stock", true)
-      .order("created_at", { ascending: false });
+      let query = supabase
+        .from("products")
+        .select(`
+          id,
+          name,
+          description,
+          price,
+          sizes,
+          in_stock,
+          brand_id,
+          category_id,
+          product_images(image_url),
+          brands(name),
+          categories(name)
+        `)
+        .eq("in_stock", true)
+        .order("created_at", { ascending: false });
 
-    if (brandId) query = query.eq("brand_id", brandId);
-    if (categoryId) query = query.eq("category_id", categoryId);
+      if (brandId) query = query.eq("brand_id", brandId);
+      if (categoryId) query = query.eq("category_id", categoryId);
 
-    const { data, error } = await query;
-    if (error) throw error;
+      const { data, error } = await query;
+      if (error) throw error;
 
-    // ✅ Rasm arrayini to‘g‘ri formatda o‘tkazish
-    const formatted = (data || []).map((p: any) => ({
-      ...p,
-      product_images: p.product_images?.map((img: any) => ({
-        image_base64: img.image_base64,
-      })) || [],
-    }));
+      // ✅ Rasm arrayini to‘g‘ri formatda o‘tkazish
+      const formatted = (data || []).map((p: any) => ({
+        ...p,
+        product_images:
+          p.product_images?.map((img: any) => ({
+            image_url: img.image_url,
+          })) || [],
+      }));
 
-    console.log("✅ Fetched products:", formatted);
-    setProducts(formatted);
-  } catch (error) {
-    console.error("❌ Error fetching products:", error);
-    toast.error("Маҳсулотларни юклашда хато");
-  } finally {
-    setLoading(false);
-  }
-};
-
+      console.log("✅ Fetched products:", formatted);
+      setProducts(formatted);
+    } catch (error) {
+      console.error("❌ Error fetching products:", error);
+      toast.error("Маҳсулотларни юклашда хато");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const addToCart = (product: Product) => {
     const existing = cart.find((item) => item.id === product.id);
+    const firstImage = product.product_images?.[0]?.image_url || null;
+
     if (existing) {
       const updated = cart.map((item) =>
-        item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+        item.id === product.id
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
       );
       setCart(updated);
     } else {
@@ -113,7 +116,7 @@ const fetchProducts = async () => {
           id: product.id,
           name: product.name,
           price: product.price,
-          image: product.product_images?.[0]?.image_base64 || null,
+          image: firstImage,
           quantity: 1,
         },
       ]);
@@ -169,7 +172,6 @@ const fetchProducts = async () => {
         </button>
       </div>
 
-      
       <AnimatePresence>
         {menuOpen && (
           <>
@@ -252,38 +254,35 @@ const fetchProducts = async () => {
           {/* PRODUCTS GRID */}
           <div id="products">
             {loading ? (
-  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-    {[...Array(Math.min(filteredProducts.length || 8, 8))].map((_, i) => (
-      <Card
-        key={i}
-        className="group bg-[#1a1a1a] border-[#2a2a2a] rounded-xl overflow-hidden"
-      >
-        {/* Skeleton Image */}
-        <div className="relative aspect-square w-full bg-[#151515] overflow-hidden">
-          <div className="absolute inset-0 bg-[#2a2a2a] animate-pulse" />
-        </div>
-
-        <CardContent className="p-5">
-          <div className="h-5 bg-[#2a2a2a] rounded w-3/4 mb-3 animate-pulse" />
-          <div className="h-4 bg-[#2a2a2a] rounded w-1/2 animate-pulse" />
-        </CardContent>
-
-        <CardFooter className="p-2 pt-0">
-          <div className="h-[50px] w-full bg-[#2a2a2a] rounded-xl animate-pulse" />
-        </CardFooter>
-      </Card>
-    ))}
-  </div>
-) : filteredProducts.length === 0 ? (
-  <div className="text-center py-20 text-gray-400 text-lg">
-    Маҳсулотлар топилмади 😔
-  </div>
-) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                {[...Array(8)].map((_, i) => (
+                  <Card
+                    key={i}
+                    className="group bg-[#1a1a1a] border-[#2a2a2a] rounded-xl overflow-hidden"
+                  >
+                    <div className="relative aspect-square w-full bg-[#151515] overflow-hidden">
+                      <div className="absolute inset-0 bg-[#2a2a2a] animate-pulse" />
+                    </div>
+                    <CardContent className="p-5">
+                      <div className="h-5 bg-[#2a2a2a] rounded w-3/4 mb-3 animate-pulse" />
+                      <div className="h-4 bg-[#2a2a2a] rounded w-1/2 animate-pulse" />
+                    </CardContent>
+                    <CardFooter className="p-2 pt-0">
+                      <div className="h-[50px] w-full bg-[#2a2a2a] rounded-xl animate-pulse" />
+                    </CardFooter>
+                  </Card>
+                ))}
+              </div>
+            ) : filteredProducts.length === 0 ? (
+              <div className="text-center py-20 text-gray-400 text-lg">
+                Маҳсулотлар топилмади 😔
+              </div>
+            ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                 {filteredProducts.map((product) => {
                   const quantity = getQuantity(product.id);
                   const firstImage =
-                    product.product_images?.[0]?.image_base64 || "/placeholder.svg";
+                    product.product_images?.[0]?.image_url || "/placeholder.svg";
 
                   return (
                     <Card
@@ -291,12 +290,11 @@ const fetchProducts = async () => {
                       className="group bg-[#1a1a1a] border-[#2a2a2a] hover:border-[#d4af37] hover:shadow-[0_0_20px_rgba(212,175,55,0.2)] transition-all duration-300 cursor-pointer overflow-hidden"
                       onClick={() => navigate(`/product/${product.id}`)}
                     >
-                      {/* Rasm joyi */}
                       <div className="relative aspect-square w-full overflow-hidden bg-[#111]">
                         <img
                           src={firstImage}
                           alt={product.name}
-                          className="w-full h-full object-cover transition-transform duration-500 "
+                          className="w-full h-full object-cover transition-transform duration-500"
                         />
                         {product.brands && (
                           <Badge className="absolute top-3 right-3 bg-[#d4af37] text-black font-semibold shadow-md">
@@ -309,7 +307,9 @@ const fetchProducts = async () => {
                         <h3 className="font-semibold text-lg text-white mb-2 line-clamp-2">
                           {product.name}
                         </h3>
-                        <p className="text-2xl font-bold text-[#d4af37]">${product.price}</p>
+                        <p className="text-2xl font-bold text-[#d4af37]">
+                          ${product.price}
+                        </p>
                       </CardContent>
 
                       <CardFooter className="p-2 pt-0">

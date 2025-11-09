@@ -26,36 +26,36 @@ const ProductDetail = () => {
 
   useEffect(() => {
     const loadProduct = async () => {
-      const { data, error } = await supabase
-        .from("products")
-        .select(`
-          *,
-          categories(name),
-          brands(name),
-          product_images(image_base64)
-        `)
-        .eq("id", id)
-        .single();
+      try {
+        const { data, error } = await supabase
+          .from("products")
+          .select(`
+            *,
+            categories(name),
+            brands(name),
+            product_images(image_url)
+          `)
+          .eq("id", id)
+          .single();
 
-      if (error) {
-        console.error(error);
+        if (error) throw error;
+
+        const productData = data as any;
+        const images =
+          productData?.product_images?.map((img: any) => img.image_url) || [];
+
+        setProduct({ ...productData, images });
+        setSelectedImage(images[0] || null);
+
+        const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+        const existing = cart.find((item: any) => item.id === productData.id);
+        setCartQty(existing ? existing.quantity : 0);
+      } catch (err) {
+        console.error("❌ Product fetch error:", err);
         toast.error("Маълумотни юклашда хатолик");
+      } finally {
         setLoading(false);
-        return;
       }
-
-      const productData = data as any;
-      const images =
-        productData?.product_images?.map((img: any) => img.image_base64) || [];
-
-      setProduct({ ...productData, images });
-      setSelectedImage(images[0] || null);
-
-      const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-      const existing = cart.find((item: any) => item.id === productData.id);
-      setCartQty(existing ? existing.quantity : 0);
-
-      setLoading(false);
     };
 
     loadProduct();
@@ -119,7 +119,7 @@ const ProductDetail = () => {
               <img
                 src={selectedImage || product.images?.[0] || "/placeholder.svg"}
                 alt={product.name}
-                className="absolute inset-0 w-full h-full object-cover transition-all duration-300 "
+                className="absolute inset-0 w-full h-full object-cover transition-all duration-300"
               />
             </div>
 
@@ -148,7 +148,6 @@ const ProductDetail = () => {
               </div>
             )}
           </div>
-
 
           {/* === RIGHT — DETAILS === */}
           <Card className="bg-[#1a1a1a] border border-[#2a2a2a] text-white shadow-2xl rounded-2xl h-auto">

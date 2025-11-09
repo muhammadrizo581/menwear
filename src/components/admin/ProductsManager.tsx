@@ -1,19 +1,16 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import {  
-  Card, CardHeader, CardContent, CardTitle,
-} from "@/components/ui/card";
 import {
-  Button,   
+  Button,
 } from "@/components/ui/button";
 import {
-   Input, 
+  Input,
 } from "@/components/ui/input";
 import {
-   Label,  
+  Label,
 } from "@/components/ui/label";
 import {
-   Textarea,  
+  Textarea,
 } from "@/components/ui/textarea";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -22,7 +19,42 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Upload, X } from "lucide-react";
+import { Plus, Pencil, Trash2, X } from "lucide-react";
+
+// === IMAGEKIT CONFIG ===
+const IMAGEKIT_UPLOAD_URL = "https://upload.imagekit.io/api/v1/files/upload";
+const IMAGEKIT_PRIVATE = import.meta.env.VITE_IMAGEKIT_PRIVATE_KEY!;
+const IMAGEKIT_URL_ENDPOINT = import.meta.env.VITE_IMAGEKIT_URL_ENDPOINT!;
+
+// === IMAGE UPLOAD FUNCTION ===
+async function uploadToImageKit(file: File): Promise<string | null> {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("fileName", file.name);
+
+    const res = await fetch(IMAGEKIT_UPLOAD_URL, {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${btoa(IMAGEKIT_PRIVATE + ":")}`,
+      },
+      body: formData,
+    });
+
+    const data = await res.json();
+    if (data.url) {
+      return data.url;
+    } else {
+      console.error("ImageKit error:", data);
+      toast.error("Rasm yuklashda xatolik");
+      return null;
+    }
+  } catch (err) {
+    console.error("ImageKit upload failed:", err);
+    toast.error("Rasm yuklanmadi");
+    return null;
+  }
+}
 
 export const ProductsManager = () => {
   const [products, setProducts] = useState<any[]>([]);
@@ -32,23 +64,32 @@ export const ProductsManager = () => {
   const [uploading, setUploading] = useState(false);
   const [files, setFiles] = useState<FileList | null>(null);
   const [formData, setFormData] = useState({
-    name: "", description: "", price: "", category_id: "", brand_id: "",
-    images: [] as string[], sizes: "", in_stock: true,
+    name: "",
+    description: "",
+    price: "",
+    category_id: "",
+    brand_id: "",
+    images: [] as string[],
+    sizes: "",
+    in_stock: true,
   });
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => {
+    loadData();
+  }, []);
 
+  // === LOAD DATA FROM SUPABASE ===
   const loadData = async () => {
     const { data: productsData } = await supabase
       .from("products")
-      .select(`*, categories(name), brands(name), product_images(image_base64)`);
+      .select(`*, categories(name), brands(name), product_images(image_url)`);
 
     const { data: categoriesData } = await supabase.from("categories").select("*");
     const { data: brandsData } = await supabase.from("brands").select("*");
 
     const formatted = (productsData || []).map((p: any) => ({
       ...p,
-      images: p.product_images?.map((i: any) => i.image_base64) || [],
+      images: p.product_images?.map((i: any) => i.image_url) || [],
     }));
 
     setProducts(formatted);
@@ -56,30 +97,30 @@ export const ProductsManager = () => {
     setBrands(brandsData || []);
   };
 
-  const handleUpload = async () => {
+  // === UPLOAD SELECTED FILES TO IMAGEKIT ===
+  const handleUpload = async (): Promise<string[]> => {
     if (!files?.length) return [];
     setUploading(true);
-    const base64Images: string[] = [];
+    const urls: string[] = [];
+
     for (const file of Array.from(files)) {
-      const reader = new FileReader();
-      const base64 = await new Promise<string>((resolve, reject) => {
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-      base64Images.push(base64);
+      const url = await uploadToImageKit(file);
+      if (url) urls.push(url);
     }
+
     setUploading(false);
-    toast.success("Расмлар юкланди ✅");
-    return base64Images;
+    toast.success("Rasmlar yuklandi ✅");
+    return urls;
   };
 
+  // === SAVE OR UPDATE PRODUCT ===
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    let uploadedBase64: string[] = formData.images || [];
+
+    let uploadedUrls: string[] = formData.images || [];
     if (files?.length) {
-      const newImages = await handleUpload();
-      uploadedBase64 = [...uploadedBase64, ...newImages];
+      const newUrls = await handleUpload();
+      uploadedUrls = [...uploadedUrls, ...newUrls];
     }
 
     const productData = {
@@ -99,63 +140,83 @@ export const ProductsManager = () => {
       await (supabase as any).from("product_images").delete().eq("product_id", editing.id);
       productId = editing.id;
     } else {
-      const { data } = await supabase
-        .from("products").insert(productData).select("id").single();
+      const { data, error } = await supabase
+        .from("products")
+        .insert(productData)
+        .select("id")
+        .single();
+      if (error) throw error;
       productId = data.id;
     }
 
-    if (uploadedBase64.length && productId) {
-      await (supabase as any).from("product_images").insert(
-        uploadedBase64.map((img) => ({ product_id: productId, image_base64: img }))
-      );
+    if (uploadedUrls.length && productId) {
+      await (supabase as any)
+        .from("product_images")
+        .insert(uploadedUrls.map((url) => ({ product_id: productId, image_url: url })));
     }
 
-    toast.success(editing ? "Янгиланди ✏️" : "Қўшилди ✅");
+    toast.success(editing ? "Mahsulot yangilandi ✏️" : "Mahsulot qo‘shildi ✅");
     resetForm();
     loadData();
   };
 
+  // === EDIT PRODUCT ===
   const handleEdit = (p: any) => {
     setEditing(p);
     setFormData({
-      name: p.name, description: p.description || "", price: p.price.toString(),
-      category_id: p.category_id || "", brand_id: p.brand_id || "",
-      images: p.images || [], sizes: p.sizes?.join(", ") || "", in_stock: p.in_stock,
+      name: p.name,
+      description: p.description || "",
+      price: p.price.toString(),
+      category_id: p.category_id || "",
+      brand_id: p.brand_id || "",
+      images: p.images || [],
+      sizes: p.sizes?.join(", ") || "",
+      in_stock: p.in_stock,
     });
   };
 
+  // === DELETE PRODUCT ===
   const handleDelete = async (id: string) => {
-    if (!confirm("Ростдан ҳам ўчирмоқчимисиз?")) return;
+    if (!confirm("Rostdan ham o‘chirmoqchimisiz?")) return;
     await (supabase as any).from("product_images").delete().eq("product_id", id);
     await supabase.from("products").delete().eq("id", id);
-    toast.success("Ўчирилди 🗑️");
+    toast.success("O‘chirildi 🗑️");
     loadData();
   };
 
   const handleRemoveImage = (url: string) => {
     setFormData((prev) => ({
-      ...prev, images: prev.images.filter((img) => img !== url),
+      ...prev,
+      images: prev.images.filter((img) => img !== url),
     }));
   };
 
   const resetForm = () => {
     setEditing(null);
     setFormData({
-      name: "", description: "", price: "", category_id: "", brand_id: "",
-      images: [], sizes: "", in_stock: true,
+      name: "",
+      description: "",
+      price: "",
+      category_id: "",
+      brand_id: "",
+      images: [],
+      sizes: "",
+      in_stock: true,
     });
     setFiles(null);
   };
 
+  // === UI ===
   return (
     <div>
-      {/* === FORM SECTION === */}
+      {/* FORM SECTION */}
       <section className="bg-[#1a1a1a]/90 border border-[#2a2a2a] rounded-2xl p-6 shadow-lg">
         <h2 className="text-[#d4af37] text-2xl font-bold mb-5 text-center">
           {editing ? "✏️ Маҳсулотни таҳрирлаш" : "➕ Янги маҳсулот қўшиш"}
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Name / Price */}
           <div className="grid md:grid-cols-2 gap-4">
             <div>
               <Label className="text-[#d4af37]">Номи</Label>
@@ -176,6 +237,7 @@ export const ProductsManager = () => {
             </div>
           </div>
 
+          {/* Description */}
           <div>
             <Label className="text-[#d4af37]">Тавсиф</Label>
             <Textarea
@@ -185,6 +247,7 @@ export const ProductsManager = () => {
             />
           </div>
 
+          {/* Category / Brand */}
           <div className="grid md:grid-cols-2 gap-4">
             <div>
               <Label className="text-[#d4af37]">Категория</Label>
@@ -224,6 +287,7 @@ export const ProductsManager = () => {
             </div>
           </div>
 
+          {/* Sizes */}
           <div>
             <Label className="text-[#d4af37]">Ўлчамлар (вергул билан)</Label>
             <Input
@@ -234,6 +298,7 @@ export const ProductsManager = () => {
             />
           </div>
 
+          {/* Images */}
           <div>
             <Label className="text-[#d4af37]">Расмлар</Label>
             <Input
@@ -263,6 +328,7 @@ export const ProductsManager = () => {
             )}
           </div>
 
+          {/* Buttons */}
           <div className="flex flex-wrap gap-3 pt-4">
             <Button
               type="submit"
@@ -293,13 +359,12 @@ export const ProductsManager = () => {
         </form>
       </section>
 
-      {/* === PRODUCT LIST SECTION === */}
-      <section className="bg-[#1a1a1a]/90 border border-[#2a2a2a] rounded-2xl p-4 shadow-lg">
+      {/* PRODUCTS LIST */}
+      <section className="bg-[#1a1a1a]/90 border border-[#2a2a2a] rounded-2xl p-4 shadow-lg mt-6">
         <h2 className="text-[#d4af37] text-xl font-semibold mb-4 text-center">
           📦 Маҳсулотлар рўйхати
         </h2>
 
-        {/* DESKTOP TABLE */}
         <div className="hidden md:block">
           <Table>
             <TableHeader>
@@ -317,10 +382,7 @@ export const ProductsManager = () => {
               {products.map((p) => (
                 <TableRow key={p.id}>
                   <TableCell>
-                    <img
-                      src={p.images?.[0]}
-                      className="w-16 h-16 object-cover rounded"
-                    />
+                    <img src={p.images?.[0]} className="w-16 h-16 object-cover rounded" />
                   </TableCell>
                   <TableCell>{p.name}</TableCell>
                   <TableCell>${p.price}</TableCell>
@@ -347,50 +409,6 @@ export const ProductsManager = () => {
               ))}
             </TableBody>
           </Table>
-        </div>
-
-        {/* MOBILE CARDS */}
-        <div className="md:hidden flex flex-col gap-4">
-          {products.map((p) => (
-            <div
-              key={p.id}
-              className="bg-[#111] rounded-2xl border border-[#222] p-4 shadow-md"
-            >
-              <div className="flex justify-between items-center mb-1">
-                <h3 className="text-[#d4af37] font-semibold text-lg">{p.name}</h3>
-                <span className="text-[#d4af37] font-medium">${p.price}</span>
-              </div>
-              <p className="text-sm text-gray-400 mb-3">
-                {p.categories?.name} / {p.brands?.name}
-              </p>
-              <div className="flex gap-2 mb-3 overflow-x-auto">
-                {p.images.slice(0, 4).map((img, i) => (
-                  <div
-                    key={i}
-                    className="w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden"
-                  >
-                    <img src={img} className="w-full h-full object-cover" />
-                  </div>
-                ))}
-              </div>
-              <div className="flex gap-3 justify-center">
-                <Button
-                  onClick={() => handleEdit(p)}
-                  size="icon"
-                  className="bg-[#d4af37] text-black rounded-[5px] w-10 h-10"
-                >
-                  <Pencil className="w-4 h-4" />
-                </Button>
-                <Button
-                  onClick={() => handleDelete(p.id)}
-                  size="icon"
-                  className="bg-red-600 text-white rounded-[5px] w-10 h-10"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-          ))}
         </div>
       </section>
     </div>
